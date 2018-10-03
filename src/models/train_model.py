@@ -14,7 +14,6 @@ from keras.preprocessing.image import ImageDataGenerator
 
 # 1, 2, 8, 16, 32, 64, 128, 256, 512
 import tensorflow as tf
-from sklearn.metrics import roc_auc_score
 
 
 def FCCN():

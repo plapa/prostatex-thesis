@@ -16,9 +16,9 @@ jupyter-client==5.2.3
 jupyter-core==4.4.0
 jupyterlab==0.34.12
 jupyterlab-launcher==0.13.1
-Keras==2.2.3
-Keras-Applications==1.0.6
-Keras-Preprocessing==1.0.5
+Keras==2.2.0
+Keras-Applications==1.0.2
+Keras-Preprocessing==1.0.1
 MarkupSafe==1.0
 mistune==0.8.3
 nbconvert==5.4.0
