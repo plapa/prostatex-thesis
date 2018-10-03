@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 
+
+# This file merges the information from all the 3 train files and creates a new one to be used to identify the lesions
 images_info_path = "../data/raw/Train_Information/ProstateX-Images-Train.csv"
 findings_info_path = "../data/raw/Train_Information/ProstateX-Findings-Train.csv"
 mhd_images_info_path= "../data/raw/Train_Information/ProstateX-Images-KTrans-Train.csv"
