@@ -1,0 +1,18 @@
+General:
+    Padding: 32
+    Channels : 3
+
+Model:
+    LearningRate : 0.001
+    Momentum : 0.001
+    BatchSize : 20
+    Epochs : 200
+    TrainValSplit : 0.7
+
+    Callbacks:
+        EarlyStoppingLR : 0.001
+        EarlyStoppingMomentum : 0.00005
+
+
+Preprocessing:
+    
