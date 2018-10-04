@@ -5,9 +5,9 @@ import shutil
 
 
 
-base_path = "../../data/raw/train_mhd"
+base_path = "data/raw/train_mhd"
 
-destination_path = "../../data/interim/train_mhd"
+destination_path = "data/interim/train_mhd"
 
 patient_folders = os.listdir(base_path)
 

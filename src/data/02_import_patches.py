@@ -6,9 +6,9 @@ import os
 from util.utils import get_image_patch, load_dicom_series, get_exam, load_ktrans
 
 def create_dataset(padding=32, overwrite=False):
-    base_path = "../data/interim/train/"
+    base_path = "data/interim/train/"
 
-    metadata = pd.read_csv("../data/interim/train_information.csv")
+    metadata = pd.read_csv("data/interim/train_information.csv")
 
     s = 0
     i = 0
@@ -61,8 +61,8 @@ def create_dataset(padding=32, overwrite=False):
 
 
     if overwrite:
-        np.save("../data/processed/X.npy", X)
-        np.save("../data/processed/y.npy", y)
+        np.save("data/processed/X.npy", X)
+        np.save("data/processed/y.npy", y)
 
     return X, y
 

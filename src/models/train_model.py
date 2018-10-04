@@ -1,25 +1,30 @@
-import keras
 import numpy as np
 
+
+import keras
 from keras.metrics import *
 from keras.optimizers import Adam, SGD
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import LearningRateScheduler, EarlyStopping
 from keras.preprocessing.image import ImageDataGenerator
 import tensorflow as tf
+
+
 from architectures.vgg16 import VGG_16
+
 
 # Image size: 256, 256, 1
 # 1, 2, 8, 16, 32, 64, 128, 256, 512
 
 
 if __name__=="__main__":
+
     model = VGG_16()
 
     model.summary()
 
-    X = np.load("../data/processed/X_2c.npy")
-    y = np.load("../data/processed/y_2c.npy")
+    X = np.load("data/processed/X_2c.npy")
+    y = np.load("data/processed/y_2c.npy")
 
     np.mean(X)
     np.std(X)
@@ -46,7 +51,7 @@ if __name__=="__main__":
     #datagen.fit(X_train)
 
 
-    model_checkpoint = ModelCheckpoint('../data/weights.h5', monitor='loss', save_best_only=True)
+    model_checkpoint = ModelCheckpoint('data/weights.h5', monitor='loss', save_best_only=True)
 
 
     c_backs = [model_checkpoint]

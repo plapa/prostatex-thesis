@@ -75,9 +75,24 @@ def load_ktrans(input_dir):
         return None
 
 
-def get_exam(lesion_info, exam='ADC', padding=32, base_path="../data/interim/train/"):
+def get_exam(lesion_info, exam='ADC', padding=32, base_path="data/interim/train/"):
+        """ Description
+        :type lesion_info: row of metada_labels
+        :param lesion_info:
     
+        :type exam: string
+        :param exam: the exam string to split in the description
     
+        :type padding: int
+        :param padding: Padding around the lesion to be retrieved
+    
+        :type base_path: string
+        :param base_path: path to where the image files are in the project directory
+    
+        :raises:
+    
+        :rtype:
+         """
     exame_row = lesion_info
     
     exame_row = exame_row.loc[exame_row.DCMSerDescr.str.contains(exam)]
@@ -89,17 +104,16 @@ def get_exam(lesion_info, exam='ADC', padding=32, base_path="../data/interim/tra
     else:
         tmp_row = exame_row.iloc[0]
         
-        exam_folder = os.path.join(base_path, tmp_row.ProxID, tmp_row.DCMSerDescr)
+        exam_folder = os.path.join(os.getcwd(), base_path, tmp_row.ProxID, tmp_row.DCMSerDescr)
     
         if(exam != 'KTrans'):
             image = load_dicom_series(input_dir=exam_folder)
 
         else:
             image = load_ktrans(exam_folder)
-        
+
         if image is None:
             return None
-        
         
         if(tmp_row.k < image.shape[2]):
             slice_array = image[:,:, tmp_row.k]

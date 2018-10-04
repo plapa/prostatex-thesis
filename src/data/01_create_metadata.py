@@ -3,9 +3,9 @@ import pandas as pd
 
 
 # This file merges the information from all the 3 train files and creates a new one to be used to identify the lesions
-images_info_path = "../data/raw/Train_Information/ProstateX-Images-Train.csv"
-findings_info_path = "../data/raw/Train_Information/ProstateX-Findings-Train.csv"
-mhd_images_info_path= "../data/raw/Train_Information/ProstateX-Images-KTrans-Train.csv"
+images_info_path = "data/raw/Train_Information/ProstateX-Images-Train.csv"
+findings_info_path = "data/raw/Train_Information/ProstateX-Findings-Train.csv"
+mhd_images_info_path= "data/raw/Train_Information/ProstateX-Images-KTrans-Train.csv"
 
 
 images_info = pd.read_csv(images_info_path)
@@ -21,4 +21,4 @@ mhd_metadata = pd.merge(mhd_image_info, findings_info, left_on=["ProxID", "fid",
 metadata_labels = pd.concat([mri_metadata, mhd_metadata], sort= False)
 metadata_labels[['i', 'j', 'k']] = metadata_labels["ijk"].str.split(" ", expand=True)
 
-metadata_labels.to_csv("../data/interim/train_information.csv")
+# metadata_labels.to_csv("data/interim/train_information.csv")

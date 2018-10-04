@@ -4,9 +4,9 @@ from os import listdir, walk
 import os
 import shutil
 
-path_raw = "../../data/raw/Test_Images"
+path_raw = "data/raw/Test_Images"
 
-path_destination = "../../data/interim/test"
+path_destination = "data/interim/test"
 
 all_substrc = [f for f in walk(path_raw)]
 f = []
