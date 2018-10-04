@@ -1,65 +1,20 @@
 import keras
 import numpy as np
 
-from keras.layers import Conv2D, Conv2DTranspose, MaxPool2D, Dense, Flatten, Dropout, BatchNormalization, Activation
-from keras.models import Sequential
-
 from keras.metrics import *
 from keras.optimizers import Adam, SGD
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import LearningRateScheduler, EarlyStopping
 from keras.preprocessing.image import ImageDataGenerator
+import tensorflow as tf
+from architectures.vgg16 import VGG_16
 
 # Image size: 256, 256, 1
-
 # 1, 2, 8, 16, 32, 64, 128, 256, 512
-import tensorflow as tf
 
-
-def FCCN():
-
-    model = Sequential()
-
-    model.add(Conv2D(input_shape=(64,64,3), strides=1, filters= 64, kernel_size=3, padding="same"))
-    model.add(Conv2D(3, 1, padding="same"))
-    model.add(Activation('relu'))
-    model.add(BatchNormalization())
-    model.add(MaxPool2D(2))
-
-
-
-    model.add(Conv2D(strides=1, filters= 64, kernel_size=3, padding="same"))
-    model.add(Conv2D(3, 1, padding= "same"))
-    model.add(Activation('relu'))
-    model.add(BatchNormalization())
-    model.add(MaxPool2D(2))
-
-    model.add(Conv2D(strides=1, filters= 128, kernel_size=3, padding= "same"))
-    model.add(Conv2D(3, 1, padding="same"))
-    model.add(Activation('relu'))
-    model.add(BatchNormalization())
-    model.add(MaxPool2D(2))
-
-    model.add(Conv2D(strides=1, filters= 128, kernel_size=3, padding= "same"))
-    model.add(Conv2D(3, 1, padding="same"))
-    model.add(Activation('relu'))
-    model.add(BatchNormalization())
-    model.add(MaxPool2D(2))
-    
-    model.add(Flatten())
-
-
-    model.add(Dense(512, activation='sigmoid'))
-    model.add(Dropout(0.5))
-    model.add(Dense(256, activation='sigmoid'))
-    model.add(Dropout(0.5))
-    #model.add(Dense(64, activation='sigmoid'))
-    model.add(Dense(1, activation='sigmoid'))
-
-    return model
 
 if __name__=="__main__":
-    model = FCCN()
+    model = VGG_16()
 
     model.summary()
 
@@ -95,7 +50,7 @@ if __name__=="__main__":
 
 
     c_backs = [model_checkpoint]
-    c_backs.append( EarlyStopping(monitor='loss', min_delta=0.001, patience=10) )
+    c_backs.append( EarlyStopping(monitor='loss', min_delta=0.001, patience=5) )
 
     model.compile( optimizer=SGD(lr=0.001, momentum=0.00005, nesterov=True), loss='binary_crossentropy')
 
