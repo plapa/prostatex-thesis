@@ -4,11 +4,11 @@ from os import listdir, walk
 import os
 import shutil
 
-path_raw = "data/raw/Test_Images"
+source_path = "data/raw/Test_Images"
 
-path_destination = "data/interim/test"
+destination_path = "data/interim/test"
 
-all_substrc = [f for f in walk(path_raw)]
+all_substrc = [f for f in walk(source_path)]
 f = []
 
 '''
@@ -17,7 +17,7 @@ to a more organized and succint one.
 
 This aims to make it easier to merge the images with the target labels.
 '''
-result = [os.path.join(dp, f) for dp, dn, filenames in os.walk(path_raw) for f in filenames]
+result = [os.path.join(dp, f) for dp, dn, filenames in os.walk(source_path) for f in filenames]
 
 for file in result:
     #print(file)
@@ -35,7 +35,7 @@ for file in result:
 
     # Check if patient folder exists
 
-    patient_folder = os.path.join(path_destination, str(temp_dicom.PatientName))
+    patient_folder = os.path.join(destination_path, str(temp_dicom.PatientName))
     exam_folder = os.path.join(patient_folder, str(temp_dicom.SeriesDescription)) 
 
     if not os.path.isdir(patient_folder):

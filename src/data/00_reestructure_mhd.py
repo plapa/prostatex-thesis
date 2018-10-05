@@ -5,15 +5,15 @@ import shutil
 
 
 
-base_path = "data/raw/train_mhd"
+source_path = "data/raw/train_mhd"
 
 destination_path = "data/interim/train"
 
-patient_folders = os.listdir(base_path)
+patient_folders = os.listdir(source_path)
 
 
 for patient in patient_folders:
-    exam_folder = os.path.join(base_path,patient)
+    exam_folder = os.path.join(source_path,patient)
 
     exam_files = os.listdir(exam_folder)
 
@@ -26,7 +26,7 @@ for patient in patient_folders:
 
     for exam in exam_files:
 
-        curr_file_path = os.path.join(base_path, patient, exam)
+        curr_file_path = os.path.join(source_path, patient, exam)
 
         dest_file_path = os.path.join(d_patient_folder, exam)
         

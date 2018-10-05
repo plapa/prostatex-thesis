@@ -4,9 +4,9 @@ import pandas as pd
 
 def create_metadata(return = False):
     # This file merges the information from all the 3 train files and creates a new one to be used to identify the lesions
-    images_info_path = "data/raw/Train_Information/ProstateX-Images-Train.csv"
-    findings_info_path = "data/raw/Train_Information/ProstateX-Findings-Train.csv"
-    mhd_images_info_path= "data/raw/Train_Information/ProstateX-Images-KTrans-Train.csv"
+    images_info_path = "data/raw/Train_Information/ProstateX-Images-Train.csv" # File that contains MRI information
+    findings_info_path = "data/raw/Train_Information/ProstateX-Findings-Train.csv" # File that contains lesion information (target)
+    mhd_images_info_path= "data/raw/Train_Information/ProstateX-Images-KTrans-Train.csv" # File that contains KTRans information
 
     # Loads the information about the MRI exames and the lesion info
     images_info = pd.read_csv(images_info_path)
@@ -28,7 +28,7 @@ def create_metadata(return = False):
     metadata_labels.to_csv("data/interim/train_information.csv")
 
     if return:
-        return metada
+        return metadata
 
 if __name__ == "__main__":
-    create_metada()
+    create_metadata()
