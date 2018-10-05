@@ -76,33 +76,34 @@ def load_ktrans(input_dir):
 
 
 def get_exam(lesion_info, exam='ADC', padding=32, base_path="data/interim/train/"):
-        """ Description
-        :type lesion_info: row of metada_labels
-        :param lesion_info:
+    """ Description
+    :type lesion_info: row of metada_labels
+    :param lesion_info:
+
+    :type exam: string
+    :param exam: the exam string to split in the description
+
+    :type padding: int
+    :param padding: Padding around the lesion to be retrieved
+
+    :type base_path: string
+    :param base_path: path to where the image files are in the project directory
+
+    :raises:
+
+    :rtype:
+    """
+
+    exam_row = lesion_info
     
-        :type exam: string
-        :param exam: the exam string to split in the description
+    exam_row = exam_row.loc[exam_row.DCMSerDescr.str.contains(exam)]
     
-        :type padding: int
-        :param padding: Padding around the lesion to be retrieved
-    
-        :type base_path: string
-        :param base_path: path to where the image files are in the project directory
-    
-        :raises:
-    
-        :rtype:
-         """
-    exame_row = lesion_info
-    
-    exame_row = exame_row.loc[exame_row.DCMSerDescr.str.contains(exam)]
-    
-    if exame_row.empty:
+    if exam_row.empty:
         print("No lesion found")
         return None
     
     else:
-        tmp_row = exame_row.iloc[0]
+        tmp_row = exam_row.iloc[0]
         
         exam_folder = os.path.join(os.getcwd(), base_path, tmp_row.ProxID, tmp_row.DCMSerDescr)
     

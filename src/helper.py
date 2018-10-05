@@ -6,8 +6,3 @@ def get_config():
         cfg = yaml.load(ymlfile)
 
     return cfg
-
-
-conf = get_config()
-
-print(conf)
