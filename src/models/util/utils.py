@@ -10,7 +10,7 @@ class NumpyEncoder(json.JSONEncoder):
         elif isinstance(obj, np.ndarray):
             return obj.tolist()
         else:
-            return super(MyEncoder, self).default(obj)
+            return super(NumpyEncoder, self).default(obj)
 
 def log_model(model, c_backs, config=None):
     """ Description
@@ -106,6 +106,6 @@ def load_architecture(arch):
     elif arch == "alexnet":
         return AlexNet()
     else:
-        Print("Arch: {} is not valid. Returning fccn.".format(arch))
+        print("Arch: {} is not valid. Returning fccn.".format(arch))
         return FCCN()
 

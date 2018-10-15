@@ -44,36 +44,47 @@ if __name__=="__main__":
     y_train = y[:train_samples]
     y_val = y[train_samples:]
 
-    # X_train, X_val, y_train, y_val = split_train_val(X, y, config["train"]["train_val_split"], seq=True)
-
-    datagen = ImageDataGenerator(
-        featurewise_center=True,
-        featurewise_std_normalization=True,
-        rotation_range=20,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
-        horizontal_flip=True)
-
-    datagen.fit(X_train)
-
     c_backs = load_callbacks(arc.weights_path)
     opt = load_optimizer()
 
     model.compile( optimizer=opt, loss='binary_crossentropy')
 
-    # model.fit_generator(datagen.flow(X_train, y_train, batch_size=config["train"]["batch_size"]),
-    #                 steps_per_epoch=len(X_train) / config["train"]["batch_size"],
-    #                 epochs=config["train"]["epochs"],
-    #                 validation_data=(X_val, y_val),
-    #                 shuffle=True,
-    #                 callbacks=c_backs )
 
+    if(config["train"]["use_augmentation"]):
+        train_datagen = ImageDataGenerator(
+            featurewise_center=True,
+            featurewise_std_normalization=True,
+            rotation_range=20,
+            width_shift_range=0.2,
+            height_shift_range=0.2,
+            horizontal_flip=True)
 
-    model.fit(X_train, y_train,
-            batch_size=config["train"]["batch_size"],
-            epochs=config["train"]["epochs"],
-            validation_data=(X_val, y_val),
-            shuffle=True,
-            callbacks=c_backs)
+        train_datagen.fit(X_train)
+
+        train_generator = train_datagen.flow(X_train, y_train, batch_size=config["train"]["batch_size"])
+
+        val_datagen = ImageDataGenerator(
+            featurewise_center=True,
+            featurewise_std_normalization=True,
+        )
+
+        val_datagen.fit(X_val)
+
+        val_generator = val_datagen.flow(X_val, y_val, batch_size=config["train"]["batch_size"])
+
+        model.fit_generator(train_generator,
+                        steps_per_epoch=len(X_train) / config["train"]["batch_size"],
+                        epochs=config["train"]["epochs"],
+                        validation_data=val_generator,
+                        validation_steps = len(X_val) / config["train"]["batch_size"],
+                        shuffle=True,
+                        callbacks=c_backs )
+    else:
+        model.fit(X_train, y_train,
+                batch_size=config["train"]["batch_size"],
+                epochs=config["train"]["epochs"],
+                validation_data=(X_val, y_val),
+                shuffle=True,
+                callbacks=c_backs)
 
     log_model(model, c_backs, config)
