@@ -16,7 +16,10 @@ from src.models.architectures.XMASNET import XmasNet
 from src.helper import get_config
 from src.models.util.callbacks import Metrics
 
+
 from src.models.util.optimizers import load_optimizer
+from src.models.util.callbacks import load_callbacks
+from src.models.util.utils import split_train_val, log_model, load_architecture
 # Image size: 256, 256, 1
 # 1, 2, 8, 16, 32, 64, 128, 256, 512
 
@@ -25,7 +28,7 @@ if __name__=="__main__":
 
     config = get_config()
 
-    arc = XmasNet()
+    arc = load_architecture(config["train"]["architecture"])
     model = arc.architecture()
 
     model.summary()
@@ -33,19 +36,15 @@ if __name__=="__main__":
     X = np.load("data/processed/X_2c.npy")
     y = np.load("data/processed/y_2c.npy")
 
-    np.mean(X)
-    np.std(X)
-
-   #  X = (X - np.mean(X)) / np.std(X)
-
     train_samples = round(X.shape[0] * config["train"]["train_val_split"])
 
     X_train = X[:train_samples,: ,:,:]
     X_val = X[train_samples:, :,::]
 
-
     y_train = y[:train_samples]
     y_val = y[train_samples:]
+
+    # X_train, X_val, y_train, y_val = split_train_val(X, y, config["train"]["train_val_split"], seq=True)
 
     datagen = ImageDataGenerator(
         featurewise_center=True,
@@ -57,15 +56,7 @@ if __name__=="__main__":
 
     datagen.fit(X_train)
 
-
-    model_checkpoint = ModelCheckpoint(arc.weights_path, monitor='loss', save_best_only=True)
-
-    c_backs = [model_checkpoint]
-    metrics = Metrics()
-    c_backs.append(metrics)
-    # c_backs.append( EarlyStopping(monitor='loss', min_delta=0.001, patience=10) )
-    # c_backs.append( ReduceLROnPlateau(monitor='loss', factor=config["train"]["callbacks"]["lr_reduce_factor"], patience = config["train"]["callbacks"]["lr_reduce_patience"]))
-
+    c_backs = load_callbacks(arc.weights_path)
     opt = load_optimizer()
 
     model.compile( optimizer=opt, loss='binary_crossentropy')
@@ -84,3 +75,5 @@ if __name__=="__main__":
             validation_data=(X_val, y_val),
             shuffle=True,
             callbacks=c_backs)
+
+    log_model(model, c_backs, config)

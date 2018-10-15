@@ -1,8 +1,10 @@
 import numpy as np
 import keras
 from sklearn.metrics import f1_score, precision_score, recall_score, roc_auc_score
+from src.helper import get_config, _load_config_params
+from keras.callbacks import *
 
-class Metrics(keras.callbacks.Callback):
+class Metrics(Callback):
 
     def on_train_begin(self, logs={}):
         self.val_f1s = []
@@ -25,4 +27,35 @@ class Metrics(keras.callbacks.Callback):
         self.val_auroc.append(_val_auroc)
         print("- val_f1: {} - val_precision: {} - val_recall {} - val_auroc {} ".format(_val_f1, _val_precision, _val_recall, _val_auroc))
         return
+
+def load_callbacks(weights_path):
+
+    config = get_config()
+    cbacks_config = config["train"]["callbacks"]
+
+    metrics = Metrics()
+    model_checkpoint = ModelCheckpoint(weights_path, monitor='val_loss', save_best_only=True)
+
+    cbacks = [metrics, model_checkpoint]
+
+
+    lr_reduce = cbacks_config["lr_reduce"]
+    if lr_reduce['apply']:
+        params = ['monitor', 'factor', 'patience', 'verbose', 'mode', 'min_delta', 'cooldown', 'min_lr']
+        lr_reduce_cb = _load_config_params(params, ReduceLROnPlateau,lr_reduce)
+
+        cbacks.append(lr_reduce_cb)
+
+
+    early_stopping = cbacks_config["early_stopping"]
+    if early_stopping["apply"]:
+        params = ['monitor', 'min_delta', 'patience', 'mode', 'verbose']
+
+        early_stopping_cb = _load_config_params(params, EarlyStopping, early_stopping)
+
+        cbacks.append(early_stopping_cb)
+    
+    return cbacks
+
+
     

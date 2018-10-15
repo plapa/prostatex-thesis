@@ -3,21 +3,37 @@ general:
     channels : 3
 
 train:
-    batch_size : 55
-    epochs : 200
+    batch_size : 8
+    epochs : 400
     train_val_split : 0.7
 
+    architecture : xmasnet
+
     callbacks:
-        lr_reduce_aply : True
-        lr_reduce_factor : 0.3
-        lr_reduce_patience : 5
-        lr_reduce_min_lr : 0.0001
+        lr_reduce:
+            apply : True
+            use_default_params : True
+            monitor : val_loss
+            factor : 0.1
+            patience : 5
+            min_lr : 0.0001
+            cooldown: 5
+            verbose : 1
+
+        early_stopping:
+            apply : False
+            use_default_params : False
+            monitor : val_loss
+            min_delta : 0.00001
+            patiente : 15
+            verbose : 1
+            mode : auto
 
     optimizers:
-        use : adam
+        use : sgd
         use_default_params : False
-        lr : 0.000002
-        decay : 0.0001
-        momentum : 0.00005
+        lr : 0.01
+        decay : 0.005
+        momentum : 0.9
         nesterov : True
         amsgrad : False
