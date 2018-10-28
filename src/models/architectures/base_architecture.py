@@ -8,6 +8,7 @@ class BaseArchitecture():
 
     config = get_config()
     input_shape = (2 * config["general"]["padding"], 2 * config["general"]["padding"], config["general"]["channels"] )
+    
     def __init__(self, load_weights = False):
         self.id = self.name.lower().strip().replace(" ","_")
         self.file = "{}.h5".format(self.id)

@@ -53,6 +53,6 @@ class VGG16(BaseArchitecture):
         model.add(Dense(1, activation='sigmoid'))
 
         if self.load_weights:
-            model.load_weights(weights_path)
+            model.load_weights(self.weights_path)
 
         return model

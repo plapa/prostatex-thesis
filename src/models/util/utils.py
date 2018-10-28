@@ -95,6 +95,8 @@ def load_architecture(arch):
     from src.models.architectures.VGG16_ import VGG16
     from src.models.architectures.XMASNET import XmasNet
     from src.models.architectures.ALEXNET import AlexNet
+    from src.models.architectures.InceptionV3 import InceptionV3
+    from src.models.architectures.InceptionResNet import InceptionResNetV2
 
     arch = arch.lower()
     if arch == "fccn":
@@ -105,6 +107,10 @@ def load_architecture(arch):
         return XmasNet()
     elif arch == "alexnet":
         return AlexNet()
+    elif arch == "inceptionv3":
+        return InceptionV3()
+    elif arch == "inceptionresnet":
+        return InceptionResNetV2
     else:
         print("Arch: {} is not valid. Returning fccn.".format(arch))
         return FCCN()
