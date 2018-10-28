@@ -3,9 +3,9 @@ import numpy as np
 import SimpleITK
 import os
 
-from util.utils import get_image_patch, load_dicom_series, get_exam, load_ktrans
-
-def create_dataset(padding=32, overwrite=False):
+from src.data.util.utils import get_image_patch, load_dicom_series, get_exam, load_ktrans
+from src.helper import get_config
+def create_dataset(padding=None, overwrite=False):
     base_path = "data/interim/train/"
 
     metadata = pd.read_csv("data/interim/train_information.csv")
@@ -13,9 +13,15 @@ def create_dataset(padding=32, overwrite=False):
     s = 0
     i = 0
 
-    padding = 32
+    if padding is None:
+        from src.helper import get_config
+        config = get_config()
 
-    X = np.empty((1000, 64,64,3))
+        padding = config["general"]["padding"]
+
+        print(padding)
+
+    X = np.empty((1000, 2*padding,2*padding,3))
 
     y = []
 
@@ -25,7 +31,6 @@ def create_dataset(padding=32, overwrite=False):
     for tup in to_iterate.itertuples():
         X_ = []
         
-        person_path = os.path.join(base_path, tup.ProxID)       
         
         lesion_info = metadata[(metadata.ProxID == tup.ProxID) & (metadata.fid == tup.fid)]
         

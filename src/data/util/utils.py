@@ -4,9 +4,7 @@ import SimpleITK
 import os
 
 
-def get_image_patch(img_array, coords, padding=32):
-
-
+def get_image_patch(img_array, coords, padding=None):
     """ Description
     :type img_array: numpy array
     :param img_array: a image comprised of a numpy array
@@ -21,6 +19,13 @@ def get_image_patch(img_array, coords, padding=32):
 
     :rtype:
      """
+
+    if padding is None:
+        from src.helper import get_config
+
+        config = get_config()
+
+        padding = config["general"]["padding"]
 
     i = coords[0]
     j = coords[1]
@@ -75,7 +80,7 @@ def load_ktrans(input_dir):
         return None
 
 
-def get_exam(lesion_info, exam='ADC', padding=32, base_path="data/interim/train/"):
+def get_exam(lesion_info, exam='ADC', padding=None, base_path="data/interim/train/"):
     """ Description
     :type lesion_info: row of metada_labels
     :param lesion_info:
@@ -93,6 +98,13 @@ def get_exam(lesion_info, exam='ADC', padding=32, base_path="data/interim/train/
 
     :rtype:
     """
+
+    if padding is None:
+        from src.helper import get_config
+
+        config = get_config()
+
+        padding = config["general"]["padding"]
 
     exam_row = lesion_info
     
