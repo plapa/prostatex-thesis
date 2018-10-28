@@ -4,23 +4,23 @@ general:
 
 train:
     batch_size : 32
-    epochs : 150
+    epochs : 400
     train_val_split : 0.7
 
-    architecture : xmasnet
+    architecture : resnet
     use_augmentation : True
 
     callbacks:
         lr_reduce:
-            apply : True
+            apply : False
             use_default_params : False
             monitor : val_loss
-            factor : 0.3
+            factor : 0.5
             patience : 5
             min_lr : 0.0001
-            min_delta: 0.005
+            min_delta: 0.001
             cooldown: 5
-            verbose : 1
+            verbose : 2
 
         early_stopping:
             apply : False
@@ -35,7 +35,7 @@ train:
         use : sgd
         use_default_params : False
         lr : 0.000001
-        decay : 0.2
-        momentum : 0.7
-        nesterov : True
+        decay : 0.3
+        momentum : 0.99
+        nesterov : False
         amsgrad : False

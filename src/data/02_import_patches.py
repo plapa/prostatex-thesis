@@ -66,11 +66,11 @@ def create_dataset(padding=None, overwrite=False):
 
 
     if overwrite:
-        np.save("data/processed/X.npy", X)
-        np.save("data/processed/y.npy", y)
+        np.save("data/processed/X_36.npy", X)
+        np.save("data/processed/y_36.npy", y)
 
     return X, y
 
 if __name__ == "__main__":
-    x,y = create_dataset()
+    x,y = create_dataset(overwrite=True)
     print(x.shape)
