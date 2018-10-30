@@ -2,6 +2,14 @@ general:
     padding: 32
     channels : 3
 
+preprocessing:
+    apply: True
+
+    augmented_ds_size : 2500
+
+    rescale: True
+    rescale_method : standartize
+
 train:
     batch_size : 32
     epochs : 400
