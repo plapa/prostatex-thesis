@@ -1,18 +1,11 @@
 from src.helper import get_config
 from imgaug import augmenters as iaa
 import numpy as np
-from transformations import normalize_01, normalize_meanstd, create_augmenter
+from src.features.transformations import normalize_01, normalize_meanstd, create_augmenter
 
-def apply_transformations(X = None, y = None, save = False):
 
+def apply_rescale(X):
     config = get_config()
-
-    # Load X, y
-
-    if X is None:
-        X = np.load("data/processed/X_2c.npy")
-        y = np.load("data/processed/y_2c.npy")
-
     if config["preprocessing"]["rescale"]:
         
         if config["preprocessing"]["rescale_method"] == "normalize":
@@ -26,6 +19,19 @@ def apply_transformations(X = None, y = None, save = False):
     
     else:
         X_ = X
+
+    return X_
+
+def apply_transformations(X = None, y = None, save = False):
+
+    config = get_config()
+
+    if X is None:
+        X = np.load("data/processed/X_2c.npy")
+        y = np.load("data/processed/y_2c.npy")
+
+
+    X_ = apply_rescale(X)
 
     aug = create_augmenter()
 
@@ -45,10 +51,47 @@ def apply_transformations(X = None, y = None, save = False):
 
     X_aug = aug.augment_images(X_augmented)
 
+    if save:
+        np.save("data/processed/X_a.npy", X_augmented)
+        np.save("data/processed/y_a.npy", y_)
+    return X_aug, np.array(y_)
 
-    return X_aug, y_
+def create_train_val_set(X = None, y = None):
+    config = get_config()
+
+    if X is None:
+        X = np.load("data/processed/X_2c.npy")
+        y = np.load("data/processed/y_2c.npy")
+
+    train_samples = round(X.shape[0] * config["train"]["train_val_split"])
+
+    X_train = X[:train_samples,: ,:,:]
+    X_val = X[train_samples:, :,::]
+
+    y_train = y[:train_samples]
+    y_val = y[train_samples:]
+
+
+    return X_train, X_val, y_train, y_val
 
 if __name__ == "__main__":
-    X, y = apply_transformations()
 
-    print(X.shape)
+    config = get_config()
+    
+    X_train, X_val, y_train, y_val = create_train_val_set()
+
+
+    # TODO concatenate the existing dataset to the augmented one
+
+    X_train, y_train = apply_transformations(X_train, y_train)
+
+    X_val = apply_rescale(X_val)
+
+
+    print(X_train.shape)
+
+    # np.save("data/processed/X_train.npy", X_train)
+    # np.save("data/processed/y_train.npy", y_train)
+
+    # np.save("data/processed/X_val.npy", X_val)
+    # np.save("data/processed/y_val.npy", y_val)
