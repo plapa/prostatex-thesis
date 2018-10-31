@@ -20,29 +20,25 @@ from src.models.util.callbacks import Metrics
 from src.models.util.optimizers import load_optimizer
 from src.models.util.callbacks import load_callbacks
 from src.models.util.utils import split_train_val, log_model, load_architecture
+# from src.features.build_features import apply_transformations
 # Image size: 256, 256, 1
 # 1, 2, 8, 16, 32, 64, 128, 256, 512
 
 
 if __name__=="__main__":
 
-    config = get_config()
 
+    X_train = np.load("data/processed/X_train.npy")
+    X_val = np.load("data/processed/X_val.npy")
+
+    y_train  = np.load("data/processed/y_train.npy")
+    y_val  = np.load("data/processed/y_val.npy")
+
+    config = get_config()
     arc = load_architecture(config["train"]["architecture"])
     model = arc.architecture()
 
     model.summary()
-
-    X = np.load("data/processed/X_2c.npy")
-    y = np.load("data/processed/y_2c.npy")
-
-    train_samples = round(X.shape[0] * config["train"]["train_val_split"])
-
-    X_train = X[:train_samples,: ,:,:]
-    X_val = X[train_samples:, :,::]
-
-    y_train = y[:train_samples]
-    y_val = y[train_samples:]
 
     c_backs = load_callbacks(arc.weights_path)
     opt = load_optimizer()
