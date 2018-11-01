@@ -49,12 +49,15 @@ def apply_transformations(X = None, y = None, save = False):
         X_augmented[index, :, :, : ] = X[rnd]
         y_.append(y[rnd])
 
+    X_augmented= np.concatenate([X_augmented, X], axis = 0)
+    y_ = np.concatenate([y_, y])    
+
     X_aug = aug.augment_images(X_augmented)
 
     if save:
         np.save("data/processed/X_a.npy", X_augmented)
         np.save("data/processed/y_a.npy", y_)
-    return X_aug, np.array(y_)
+    return X_aug, y_
 
 def create_train_val_set(X = None, y = None):
     config = get_config()
@@ -74,8 +77,7 @@ def create_train_val_set(X = None, y = None):
 
     return X_train, X_val, y_train, y_val
 
-if __name__ == "__main__":
-
+def create_augmented_dataset(save=False, return_data = False):
     config = get_config()
     
     X_train, X_val, y_train, y_val = create_train_val_set()
@@ -87,11 +89,17 @@ if __name__ == "__main__":
 
     X_val = apply_rescale(X_val)
 
+    if save:
+        np.save("data/processed/X_train.npy", X_train)
+        np.save("data/processed/y_train.npy", y_train)
 
-    print(X_train.shape)
+        np.save("data/processed/X_val.npy", X_val)
+        np.save("data/processed/y_val.npy", y_val)
 
-    # np.save("data/processed/X_train.npy", X_train)
-    # np.save("data/processed/y_train.npy", y_train)
+    if return_data:
+        return X_train, X_val, y_train, y_val
 
-    # np.save("data/processed/X_val.npy", X_val)
-    # np.save("data/processed/y_val.npy", y_val)
+if __name__ == "__main__":
+
+    create_augmented_dataset(save=True)
+
