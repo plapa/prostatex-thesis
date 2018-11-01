@@ -5,17 +5,17 @@ general:
 preprocessing:
     apply: True
 
-    augmented_ds_size : 1000
+    augmented_ds_size : 300
 
     rescale: True
     rescale_method : standartize
 
 train:
     batch_size : 32
-    epochs : 8
+    epochs : 150
     train_val_split : 0.7
 
-    architecture : resnet
+    architecture : vgg16
     use_augmentation : False
 
     callbacks:
@@ -34,16 +34,16 @@ train:
             apply : False
             use_default_params : False
             monitor : val_loss
-            min_delta : 0.00001
-            patiente : 15
+            min_delta : 0.000003
+            patience : 15
             verbose : 1
             mode : auto
 
     optimizers:
-        use : sgd
+        use : rmsprop
         use_default_params : False
-        lr : 0.0005
-        decay : 0.9
-        momentum : 0.3
+        lr : 0.000001
+        decay : 0.1
+        momentum : 0.9
         nesterov : True
         amsgrad : False

@@ -9,7 +9,7 @@ def apply_rescale(X):
     if config["preprocessing"]["rescale"]:
         
         if config["preprocessing"]["rescale_method"] == "normalize":
-            X_ = normalize_01(X)
+            X_ = normalize_meanstd(X)
         
         elif config["preprocessing"]["rescale_method"] == "standartize":
             X_ = normalize_01(X)
@@ -31,7 +31,7 @@ def apply_transformations(X = None, y = None, save = False):
         y = np.load("data/processed/y_2c.npy")
 
 
-    X_ = apply_rescale(X)
+    # X_ = apply_rescale(X)
 
     aug = create_augmenter()
 
@@ -82,8 +82,6 @@ def create_augmented_dataset(save=False, return_data = False):
     
     X_train, X_val, y_train, y_val = create_train_val_set()
 
-
-    # TODO concatenate the existing dataset to the augmented one
 
     X_train, y_train = apply_transformations(X_train, y_train)
 

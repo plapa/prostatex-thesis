@@ -11,7 +11,7 @@ from keras import backend as K
 class ResNet(BaseArchitecture):
     name = "ResNet"
     def architecture(self):
-        base_model = ResNet50(include_top=False, input_shape=(self.input_shape), classes=1, weights=None, pooling=None)
+        base_model = ResNet50(include_top=False, input_shape=(self.input_shape), classes=1, weights=None, pooling='avg')
         
         top_model = Sequential()
 

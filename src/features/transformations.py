@@ -1,5 +1,6 @@
 from src.helper import get_config
 from imgaug import augmenters as iaa
+import numpy as np
 
 def normalize_meanstd(x, axis=(1,2)): 
     # axis param denotes axes along which mean & std reductions are to be performed

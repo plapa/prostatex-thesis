@@ -20,7 +20,7 @@ from src.models.util.callbacks import Metrics
 from src.models.util.optimizers import load_optimizer
 from src.models.util.callbacks import load_callbacks
 from src.models.util.utils import split_train_val, log_model, load_architecture
-# from src.features.build_features import apply_transformations
+from src.features.build_features import apply_transformations, create_augmented_dataset, apply_rescale
 # Image size: 256, 256, 1
 # 1, 2, 8, 16, 32, 64, 128, 256, 512
 
@@ -28,11 +28,16 @@ from src.models.util.utils import split_train_val, log_model, load_architecture
 if __name__=="__main__":
 
 
-    X_train = np.load("data/processed/X_train.npy")
-    X_val = np.load("data/processed/X_val.npy")
+    # X_train = np.load("data/processed/X_train.npy")
+    # X_val = np.load("data/processed/X_val.npy")
 
-    y_train  = np.load("data/processed/y_train.npy")
-    y_val  = np.load("data/processed/y_val.npy")
+    # y_train  = np.load("data/processed/y_train.npy")
+    # y_val  = np.load("data/processed/y_val.npy")
+
+    X_train, X_val, y_train, y_val = create_augmented_dataset(return_data=True)
+
+    X_train = apply_rescale(X_train)
+    X_val = apply_rescale(X_val)
 
     config = get_config()
     arc = load_architecture(config["train"]["architecture"])
