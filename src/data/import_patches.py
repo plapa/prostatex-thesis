@@ -2,10 +2,15 @@ import pandas as pd
 import numpy as np
 import SimpleITK
 import os
+from imgaug import augmenters as iaa
+
 
 from src.data.util.utils import get_image_patch, load_dicom_series, get_exam, load_ktrans
 from src.helper import get_config
+
 def create_dataset(padding=None, overwrite=False):
+
+    config = get_config()
     base_path = "data/interim/train/"
 
     metadata = pd.read_csv("data/interim/train_information.csv")
@@ -14,8 +19,6 @@ def create_dataset(padding=None, overwrite=False):
     i = 0
 
     if padding is None:
-        from src.helper import get_config
-        config = get_config()
 
         padding = config["general"]["padding"]
 
@@ -27,6 +30,8 @@ def create_dataset(padding=None, overwrite=False):
 
     i = 0
     to_iterate = metadata.drop_duplicates(["ProxID", "fid", "pos"])[["ProxID", "fid", "ClinSig"]]
+
+    aug = iaa.Scale(0.5, interpolation=config["preprocessing"]["interpolation"])
 
     for tup in to_iterate.itertuples():
         X_ = []
@@ -40,9 +45,11 @@ def create_dataset(padding=None, overwrite=False):
             continue
             
 
-        t2_tse = get_exam(lesion_info, 't2_tse_tra', padding=padding)
+        t2_tse = get_exam(lesion_info, 't2_tse_tra', padding=2*padding)
         if t2_tse is None:
             continue
+        t2_tse = np.uint8(t2_tse)
+        t2_tse = aug.augment_images(t2_tse)
         
         ktrans = get_exam(lesion_info, 'KTrans', padding=padding)
         
@@ -50,7 +57,7 @@ def create_dataset(padding=None, overwrite=False):
             continue
 
         X_ = np.concatenate([adc, t2_tse, ktrans], axis = 3)
-        # X = np.append(X, X_, axis=0)
+
         X[i, :, :, :] = X_
         i = i+1
         
@@ -72,5 +79,5 @@ def create_dataset(padding=None, overwrite=False):
     return X, y
 
 if __name__ == "__main__":
-    x,y = create_dataset(overwrite=True)
+    x,y = create_dataset(overwrite=False)
     print(x.shape)

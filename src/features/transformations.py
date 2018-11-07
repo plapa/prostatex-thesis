@@ -39,22 +39,61 @@ def create_augmenter():
         iaa.SaltAndPepper(0.01, per_channel=True),
         iaa.Dropout(p=0.01, per_channel=True),
         iaa.OneOf([iaa.Multiply((0.5, 1.5)),
-        iaa.Multiply((0.5, 1.5), per_channel=0.5)])
+        iaa.Multiply((0.5, 1.5), per_channel=0.5)]),
+        RescaleIntensity(per_channel= False)
         
         ])
     ])
 
     return seq
 
-class Equalize_Hist(Augmenter):
+class EqualizeHist(Augmenter):
     def __init__(self,name=None, deterministic=False, random_state=None, per_channel = False):
-        super(Equalize_Hist, self).__init__(name=name, deterministic=deterministic, random_state=random_state)
+        super(EqualizeHist, self).__init__(name=name, deterministic=deterministic, random_state=random_state)
         
-        self.per_channel = False
+        self.per_channel = per_channel
 
     def _augment_images(self, images, random_state, parents, hooks):
         for i in range(len(images)):
+            if self.per_channel:
+                tmp_image = images[i]
+                
+                for ch in arange(tmp_image.shape[2]):
+                    tmp_image[: , :, ch] = exposure.equalize_hist(tmp_image[: , :, ch])
+                    
+                images[i] = tmp_image
+            else:
                 images[i] = exposure.equalize_hist(images[i])
+        return images
+
+    def _augment_keypoints(self, keypoints_on_images, random_state, parents, hooks):
+        return keypoints_on_images
+
+    def get_parameters(self):
+        return [self.p]
+
+class RescaleIntensity(Augmenter):
+    def __init__(self,name=None, deterministic=False, random_state=None, per_channel = False, percentiles = (2, 98)):
+        super(RescaleIntensity, self).__init__(name=name, deterministic=deterministic, random_state=random_state)
+        
+        self.per_channel = per_channel
+        self.percentiles = percentiles
+
+    def _augment_images(self, images, random_state, parents, hooks):
+
+        for i in range(len(images)):
+            if self.per_channel:
+                tmp_image = images[i]
+                
+                for ch in arange(tmp_image.shape[2]):
+                    p1, p2 = np.percentile(img[: , : , ch], self.percentiles)
+                    tmp_image[: ,: , ch] = exposure.rescale_intensity(tmp_image[: ,: , ch], in_range=(p1, p2))
+
+                    
+                images[i] = tmp_image
+            else:
+                p1, p2 = np.percentile(images[i], self.percentiles)
+                images[i] = exposure.rescale_intensity(images[i], in_range=(p1, p2))
         return images
 
     def _augment_keypoints(self, keypoints_on_images, random_state, parents, hooks):

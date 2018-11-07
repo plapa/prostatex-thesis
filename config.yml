@@ -10,8 +10,10 @@ preprocessing:
     rescale: True
     rescale_method : standartize
 
+    interpolation : cubic
+
 train:
-    batch_size : 32
+    batch_size : 16
     epochs : 150
     train_val_split : 0.7
 
@@ -20,7 +22,7 @@ train:
 
     callbacks:
         lr_reduce:
-            apply : True
+            apply : False
             use_default_params : False
             monitor : val_loss
             factor : 0.5
@@ -40,10 +42,10 @@ train:
             mode : auto
 
     optimizers:
-        use : rmsprop
+        use : sgd
         use_default_params : False
-        lr : 0.000001
-        decay : 0.1
+        lr : 0.01
+        decay : 0.0001
         momentum : 0.9
         nesterov : True
         amsgrad : False
