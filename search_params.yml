@@ -1,9 +1,6 @@
 train:
     optimizers:
-        use : sgd
-        use_default_params : False
+        architecture : [xmasnet, resnet, fccn]
+        use : [sgd, adam, rmsprop]
         lr : [0.01, 0.001, 0.00001]
-        decay : 0.3
         momentum : [0.00, 0.2, 0.7, 0.9]
-        nesterov : True
-        amsgrad : False

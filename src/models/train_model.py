@@ -1,46 +1,43 @@
 import numpy as np
-
+import yaml 
 
 import keras
 from keras.metrics import *
-from keras.optimizers import Adam, SGD
-from keras.callbacks import ModelCheckpoint
-from keras.callbacks import LearningRateScheduler, EarlyStopping, ReduceLROnPlateau
 from keras.preprocessing.image import ImageDataGenerator
 import tensorflow as tf
 
 
-from src.models.architectures.FCCN_ import FCCN
-from src.models.architectures.VGG16_ import VGG16
-from src.models.architectures.XMASNET import XmasNet
+
 from src.helper import get_config
 from src.models.util.callbacks import Metrics
 
 
 from src.models.util.optimizers import load_optimizer
 from src.models.util.callbacks import load_callbacks
-from src.models.util.utils import split_train_val, log_model, load_architecture
+# from src.models.util.utils import split_train_val, log_model, load_architecture, reservoir_sample, rename_file, gen_combinations
+from src.models.util.utils import *
 from src.features.build_features import apply_transformations, create_augmented_dataset, apply_rescale
 # Image size: 256, 256, 1
 # 1, 2, 8, 16, 32, 64, 128, 256, 512
 
 
-if __name__=="__main__":
-
-
+def train_model():
     # X_train = np.load("data/processed/X_train.npy")
     # X_val = np.load("data/processed/X_val.npy")
 
     # y_train  = np.load("data/processed/y_train.npy")
     # y_val  = np.load("data/processed/y_val.npy")
 
-    X_train, X_val, y_train, y_val = create_augmented_dataset(return_data=True)
+    X = np.load("data/processed/X_36.npy")
+    y = np.load("data/processed/y_36.npy")
+
+    X_train, X_val, y_train, y_val = create_augmented_dataset(X = X, y = y, return_data=True)
 
     X_train = apply_rescale(X_train)
     X_val = apply_rescale(X_val)
 
     config = get_config()
-    arc = load_architecture(config["train"]["architecture"])
+    arc = load_architecture(config["train"]["optimizers"]["architecture"])
     model = arc.architecture()
 
     model.summary()
@@ -89,3 +86,31 @@ if __name__=="__main__":
                 callbacks=c_backs)
 
     log_model(model, c_backs, config)
+
+if __name__ == "__main__":
+    grid_search = True
+
+    if grid_search == False:
+        train_model()
+
+    else:
+        config = get_config()
+        with open("search_params.yml", 'r') as ymlfile:
+            grid_search = yaml.load(ymlfile)
+
+        rename_file('config.yml', 'config.yml.default')
+
+        sample = reservoir_sample(gen_combinations(grid_search["train"]["optimizers"]), 10)
+
+        for s in sample:
+
+            for key in s:
+                if key in config["train"]["optimizers"].keys():
+                    config["train"]["optimizers"][key] = s[key]
+
+            with open('config.yml', 'w') as outfile:
+                yaml.dump(config, outfile, default_flow_style=False)
+
+                train_model()
+
+                rename_file(('config.yml.default', 'config.yml'))

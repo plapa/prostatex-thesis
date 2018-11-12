@@ -77,10 +77,13 @@ def create_train_val_set(X = None, y = None):
 
     return X_train, X_val, y_train, y_val
 
-def create_augmented_dataset(save=False, return_data = False):
+def create_augmented_dataset(X = None, y = None,save=False, return_data = False):
     config = get_config()
-    
-    X_train, X_val, y_train, y_val = create_train_val_set()
+
+    if X is None:
+        X_train, X_val, y_train, y_val = create_train_val_set()
+    else:
+        X_train, X_val, y_train, y_val = create_train_val_set(X, y)
 
 
     X_train, y_train = apply_transformations(X_train, y_train)
@@ -99,5 +102,6 @@ def create_augmented_dataset(save=False, return_data = False):
 
 if __name__ == "__main__":
 
-    create_augmented_dataset(save=True)
+
+    create_augmented_dataset(X, y, save=True)
 

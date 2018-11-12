@@ -1,51 +1,42 @@
 general:
-    padding: 32
-    channels : 3
-
+  channels: 3
+  padding: 32
 preprocessing:
-    apply: True
-
-    augmented_ds_size : 300
-
-    rescale: True
-    rescale_method : standartize
-
-    interpolation : cubic
-
+  apply: true
+  augmented_ds_size: 300
+  interpolation: cubic
+  rescale: true
+  rescale_method: standartize
 train:
-    batch_size : 16
-    epochs : 150
-    train_val_split : 0.7
-
-    architecture : vgg16
-    use_augmentation : False
-
-    callbacks:
-        lr_reduce:
-            apply : False
-            use_default_params : False
-            monitor : val_loss
-            factor : 0.5
-            patience : 5
-            min_lr : 0.0000001
-            min_delta: 0.001
-            cooldown: 5
-            verbose : 2
-
-        early_stopping:
-            apply : False
-            use_default_params : False
-            monitor : val_loss
-            min_delta : 0.000003
-            patience : 15
-            verbose : 1
-            mode : auto
-
-    optimizers:
-        use : sgd
-        use_default_params : False
-        lr : 0.01
-        decay : 0.0001
-        momentum : 0.9
-        nesterov : True
-        amsgrad : False
+  batch_size: 16
+  callbacks:
+    early_stopping:
+      apply: true
+      min_delta: 1.0e-06
+      mode: auto
+      monitor: val_loss
+      patience: 15
+      use_default_params: false
+      verbose: 1
+    lr_reduce:
+      apply: false
+      cooldown: 5
+      factor: 0.5
+      min_delta: 0.001
+      min_lr: 1.0e-07
+      monitor: val_loss
+      patience: 5
+      use_default_params: false
+      verbose: 2
+  epochs: 100
+  optimizers:
+    amsgrad: false
+    architecture: xmasnet
+    decay: 0.001
+    lr: 1.0e-05
+    momentum: 0.0
+    nesterov: true
+    use: adam
+    use_default_params: false
+  train_val_split: 0.7
+  use_augmentation: false

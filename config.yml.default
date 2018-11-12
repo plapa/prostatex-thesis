@@ -1,0 +1,51 @@
+general:
+    padding: 32
+    channels : 3
+
+preprocessing:
+    apply: True
+
+    augmented_ds_size : 300
+
+    rescale: True
+    rescale_method : standartize
+
+    interpolation : cubic
+
+train:
+    batch_size : 16
+    epochs : 100
+    train_val_split : 0.7
+
+    use_augmentation : False
+
+    callbacks:
+        lr_reduce:
+            apply : False
+            use_default_params : False
+            monitor : val_loss
+            factor : 0.5
+            patience : 5
+            min_lr : 0.0000001
+            min_delta: 0.001
+            cooldown: 5
+            verbose : 2
+
+        early_stopping:
+            apply : True
+            use_default_params : False
+            monitor : val_loss
+            min_delta : 0.000001
+            patience : 15
+            verbose : 1
+            mode : auto
+
+    optimizers:
+        architecture : resnet
+        use : sgd
+        use_default_params : False
+        lr : 0.00003
+        decay : 0.001
+        momentum : 0.9
+        nesterov : True
+        amsgrad : False

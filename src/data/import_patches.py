@@ -79,5 +79,5 @@ def create_dataset(padding=None, overwrite=False):
     return X, y
 
 if __name__ == "__main__":
-    x,y = create_dataset(overwrite=False)
+    x,y = create_dataset(overwrite=True)
     print(x.shape)

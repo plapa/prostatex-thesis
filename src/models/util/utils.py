@@ -1,5 +1,11 @@
 import numpy as np
 import json
+import itertools
+import random
+
+
+from src.helper import get_config
+from src.models.train_model import train_model
 
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -111,4 +117,31 @@ def load_architecture(arch):
     else:
         print("Arch: {} is not valid. Returning fccn.".format(arch))
         return FCCN()
+
+def reservoir_sample(iterable, k):
+    it = iter(iterable)
+    if not (k > 0):
+        raise ValueError("sample size must be positive")
+
+    sample = list(itertools.islice(it, k)) # fill the reservoir
+    random.shuffle(sample) # if number of items less then *k* then
+                           #   return all items in random order.
+    for i, item in enumerate(it, start=k+1):
+        j = random.randrange(i) # random [0..i)
+        if j < k:
+            sample[j] = item # replace item with gradually decreasing probability
+    return sample
+
+def gen_combinations(d):
+    keys, values = d.keys(), d.values()
+    combinations = itertools.product(*values)
+
+    for c in combinations:
+        yield dict(zip(keys, c))
+
+def rename_file(src_file, dst_file):
+    import shutil
+    shutil.copy(src_file, dst_file)
+
+
 
