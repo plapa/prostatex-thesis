@@ -21,7 +21,7 @@ from src.features.build_features import apply_transformations, create_augmented_
 # 1, 2, 8, 16, 32, 64, 128, 256, 512
 
 
-def train_model():
+def train_model(current = 0):
     # X_train = np.load("data/processed/X_train.npy")
     # X_val = np.load("data/processed/X_val.npy")
 
@@ -40,7 +40,17 @@ def train_model():
     arc = load_architecture(config["train"]["optimizers"]["architecture"])
     model = arc.architecture()
 
-    model.summary()
+    # model.summary()
+
+    print(" ################################## ")
+    print(" #      MODEL CONFIGURATION       # ")
+
+    print("CURRENT MODEL: " + str(current))
+    for k in config["train"]["optimizers"]:
+        print( str(k) + ":" + str(config["train"]["optimizers"][k]))
+    print(" ################################## ")
+
+
 
     c_backs = load_callbacks(arc.weights_path)
     opt = load_optimizer()
@@ -102,7 +112,10 @@ if __name__ == "__main__":
 
         sample = reservoir_sample(gen_combinations(grid_search["train"]["optimizers"]), 10)
 
+        i = 0
+
         for s in sample:
+            i = i + 1
 
             for key in s:
                 if key in config["train"]["optimizers"].keys():
@@ -111,6 +124,8 @@ if __name__ == "__main__":
             with open('config.yml', 'w') as outfile:
                 yaml.dump(config, outfile, default_flow_style=False)
 
-                train_model()
-
-                rename_file(('config.yml.default', 'config.yml'))
+                try:
+                    train_model(current = i)
+                    rename_file('config.yml.default', 'config.yml')
+                except:
+                    print("Error occured")

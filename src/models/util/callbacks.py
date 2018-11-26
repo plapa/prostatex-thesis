@@ -16,10 +16,15 @@ class Metrics(Callback):
         val_predict = (np.asarray(self.model.predict(self.validation_data[0]))).round()
         val_targ = self.validation_data[1]
 
-        _val_f1 = round(f1_score(val_targ, val_predict), 4)
-        _val_recall = round(recall_score(val_targ, val_predict), 4)
-        _val_precision = round(precision_score(val_targ, val_predict), 4)
-        _val_auroc = round(roc_auc_score(val_targ, val_predict), 4)
+        try:
+            _val_f1 = round(f1_score(val_targ, val_predict), 4)
+            _val_recall = round(recall_score(val_targ, val_predict), 4)
+            _val_precision = round(precision_score(val_targ, val_predict), 4)
+            _val_auroc = round(roc_auc_score(val_targ, val_predict), 4)
+        
+        except UndefinedMetricWarning:
+            print("ERROR")
+
 
         self.val_f1s.append(_val_f1)
         self.val_recalls.append(_val_recall)

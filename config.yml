@@ -31,12 +31,12 @@ train:
   epochs: 100
   optimizers:
     amsgrad: false
-    architecture: xmasnet
+    architecture: resnet
     decay: 0.001
-    lr: 1.0e-05
-    momentum: 0.0
+    lr: 0.01
+    momentum: 0.7
     nesterov: true
-    use: adam
+    use: rmsprop
     use_default_params: false
   train_val_split: 0.7
   use_augmentation: false
