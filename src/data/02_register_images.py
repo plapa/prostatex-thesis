@@ -116,7 +116,10 @@ def register_images():
     for patient, patient_dataset in patient_images:
         print('ID: ' + str(patient))
         
-        reference = patient_dataset[patient_dataset.DCMSerDescr == "t2_tse_tra"].iloc[0]
+        try:
+            reference = patient_dataset[patient_dataset.DCMSerDescr == "t2_tse_tra"].iloc[0]
+        except:
+            continue
         
         target_patient_folder = os.path.join(target_path, patient)
 
