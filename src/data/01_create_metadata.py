@@ -2,7 +2,7 @@ import os
 import pandas as pd
 
 
-def create_metadata(return = False):
+def create_metadata(return_metadata = False):
     # This file merges the information from all the 3 train files and creates a new one to be used to identify the lesions
     images_info_path = "data/raw/Train_Information/ProstateX-Images-Train.csv" # File that contains MRI information
     findings_info_path = "data/raw/Train_Information/ProstateX-Findings-Train.csv" # File that contains lesion information (target)
@@ -22,12 +22,12 @@ def create_metadata(return = False):
 
     # Concatenates both data frames and creates a new column that contains the lesion coordinates
     metadata_labels = pd.concat([mri_metadata, mhd_metadata], sort= False)
-    metadata_labels[['i', 'j', 'k']] = metadata_labels["ijk"].str.split(" ", expand=True)
+    #metadata_labels[['i', 'j', 'k']] = metadata_labels["ijk"].str.split(" ", expand=True)
 
     # Save the data frame onto disk
     metadata_labels.to_csv("data/interim/train_information.csv")
 
-    if return:
+    if return_metadata:
         return metadata
 
 if __name__ == "__main__":
