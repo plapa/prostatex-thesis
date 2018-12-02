@@ -22,16 +22,21 @@ base_path = "data/interim/train/"
 target_path = "data/interim/train_registered/"   
 
 def get_isotropic_image(info):
+    # ProxID
+    # DCMSerDescr
+    # WorldMatrix
+    # VoxelSpacing
+    #
     
-    exam_dir = os.path.join(base_path, info.ProxID, info.DCMSerDescr)
+    exam_dir = os.path.join(base_path, info["ProxID"], info["DCMSerDescr"])
     
-    if "KTrans" in info.DCMSerDescr:   
+    if "KTrans" in info["DCMSerDescr"]:   
         mhd = [a for a in os.listdir(exam_dir) if ".mhd" in a and "T_P" not in a][0]
         path = os.path.join(exam_dir, mhd)
         itkimage = SimpleITK.ReadImage(path)
         
         image_array = SimpleITK.GetArrayFromImage(itkimage)
-        affine = np.fromstring(info.WorldMatrix, sep=",").reshape((4,4))
+        affine = np.fromstring(info["WorldMatrix"], sep=",").reshape((4,4))
         zoom = itkimage.GetSpacing()
         
     else:
@@ -43,8 +48,8 @@ def get_isotropic_image(info):
         dicom_array = SimpleITK.GetArrayFromImage(dicom_series)
         image_array = np.moveaxis(dicom_array, 0, -1)
 
-        zoom = np.fromstring(info.VoxelSpacing, sep=",")
-        affine = np.fromstring(info.WorldMatrix, sep=",").reshape((4,4))
+        zoom = np.fromstring(info["VoxelSpacing"], sep=",")
+        affine = np.fromstring(info["WorldMatrix"], sep=",").reshape((4,4))
     
     data, affine = reslice(image_array, affine, zoom, (1., 1., 1.))
     
@@ -105,6 +110,14 @@ def apply_co_registration(static, static_grid2world,
     
     return rigid.transform(moving)
 
+def get_ref_dic_from_pd(reference):
+
+    reference = {"ProxID":reference.ProxID, "DCMSerDescr":reference.DCMSerDescr,
+    "WorldMatrix":reference.WorldMatrix, "VoxelSpacing":reference.VoxelSpacing }
+    
+    return reference
+
+
 def register_images():
     metadata = pd.read_csv("data/interim/train_information.csv")
 
@@ -126,11 +139,12 @@ def register_images():
         if not os.path.isdir(target_patient_folder):
             print("{} not yet processed. Starting now".format(patient))
             os.makedirs(target_patient_folder)
-        
+
+        reference = get_ref_dic_from_pd(reference)
         ref_image, ref_affine = get_isotropic_image(reference)
         
         
-        img_path = os.path.join(target_patient_folder, "{}.npy".format(reference.DCMSerDescr))
+        img_path = os.path.join(target_patient_folder, "{}.npy".format(reference["DCMSerDescr"]))
         np.save(img_path, ref_image)
         
         for b, row in patient_dataset.iterrows():
@@ -139,15 +153,18 @@ def register_images():
             if row.DCMSerDescr == "t2_tse_tra":
                 continue
             else:
-                img_path = os.path.join(target_patient_folder, "{}.npy".format(row.DCMSerDescr))
+                img_path = os.path.join(target_patient_folder, "{}.npy".format(row["DCMSerDescr"]))
 
                 if not os.path.isfile(img_path):
                     print("\t Starting image {}".format(row.DCMSerDescr))
+
+                    row = get_ref_dic_from_pd(row)
 
                     moving_image, moving_affine = get_isotropic_image(row)
                     transformed = apply_co_registration(ref_image, ref_affine, moving_image, moving_affine )
 
                     np.save(img_path, transformed)
+
 
 if __name__ == "__main__":
     register_images()
