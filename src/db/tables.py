@@ -22,6 +22,7 @@ class Lesion(Base):
     reg_i = Column(Integer)
     reg_j = Column(Integer)
     reg_k = Column(Integer)
+    ijk = Column(String(10))
     clin_sig = Column(Boolean)
     
     

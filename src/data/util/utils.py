@@ -29,6 +29,9 @@ def get_image_patch(img_array, coords, padding=None):
 
     i = coords[0]
     j = coords[1]
+    k = coords[2]
+    
+
 
     if isinstance(padding, list):
         h_padding = padding[0]
@@ -36,11 +39,16 @@ def get_image_patch(img_array, coords, padding=None):
     else:
         h_padding = padding
         v_padding = padding
-
-    X_ = img_array[j - v_padding: j + v_padding, i - h_padding: i + h_padding]
-    # NUMPY ARRAYs are of standart (row, columns)
-
-    return X_
+        
+    try:
+        X_ = img_array[j - v_padding : j + v_padding, i - h_padding : i + h_padding, k]
+    except:
+        print(img_array.shape)
+        print(coords)
+        return None
+    else:    
+        if(X_.shape == (2*padding,2*padding)):
+            return np.asarray(X_).reshape((1,2*padding,2*padding, 1))
 
 
 

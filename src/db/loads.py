@@ -26,6 +26,9 @@ def load_lesions():
     
     lesion_coordinates = lesion_coordinates[["ProxID", "fid", "zone", "reg_i", "reg_j", "reg_k", "ClinSig"]]
     lesion_coordinates.rename(columns={"ClinSig" : "clin_sig", "ProxID": "patient_id"}, inplace=True)
+
+    # To make sure that dfferne coordinates mean different lesions
+    lesion_coordinates["ijk"] = lesion_coordinates[["reg_i", "reg_j", "reg_k"]].apply(lambda x: ''.join(str(x.values)), axis=1)
     
     lesion_coordinates.to_sql('lesions', con=engine, if_exists="append", index=False)
 
