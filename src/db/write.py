@@ -41,13 +41,13 @@ def load_images():
         return os.path.isfile(image_path)
     
     
-    images = metadata[["ProxID", "DCMSerDescr"]].drop_duplicates()
+    images = metadata[["ProxID", "DCMSerDescr", "VoxelSpacing", "WorldMatrix"]].drop_duplicates(["ProxID", "DCMSerDescr"])
 
     g = lambda x: pd.Series(check_reg_img_exists(x.ProxID, x.DCMSerDescr))
 
     images[["registered"]] = images[["ProxID", "DCMSerDescr"]].apply(g, axis=1)
     
-    images.rename(columns={"ProxID" : "patient_id", "DCMSerDescr": "imagetype"}, inplace=True)
+    images.rename(columns={"ProxID" : "patient_id", "DCMSerDescr": "imagetype", "VoxelSpacing": "voxel_spacing", "WorldMatrix": "world_matrix"}, inplace=True)
     
     images.to_sql("images", con=engine, if_exists="append", index=False)
 

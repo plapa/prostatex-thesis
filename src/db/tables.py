@@ -32,7 +32,8 @@ class Image(Base):
     image_id = Column(Integer, primary_key=True, autoincrement = True)
     patient_id = Column(Integer, ForeignKey('patients.ProxID'))
     imagetype = Column(String(150))
-
+    world_matrix = Column(String(250))
+    voxel_spacing = Column(String(50))
     registered = Column(Boolean)
 
 class ImageLesion(Base):

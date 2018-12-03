@@ -8,6 +8,8 @@ import dipy
 from dipy.align.reslice import reslice
 
 from src.utils.utils import HiddenPrints
+from src.data.util.utils import get_ref_dic_from_pd, get_ref_dic_from_db
+from src.db.read import read_patient_image, read_exams
 
 from dipy.align.imaffine import (transform_centers_of_mass,
                                  AffineMap,
@@ -36,6 +38,8 @@ def get_isotropic_image(info):
         itkimage = SimpleITK.ReadImage(path)
         
         image_array = SimpleITK.GetArrayFromImage(itkimage)
+        image_array = np.moveaxis(image_array, 0, -1)
+
         affine = np.fromstring(info["WorldMatrix"], sep=",").reshape((4,4))
         zoom = itkimage.GetSpacing()
         
@@ -110,12 +114,61 @@ def apply_co_registration(static, static_grid2world,
     
     return rigid.transform(moving)
 
-def get_ref_dic_from_pd(reference):
 
-    reference = {"ProxID":reference.ProxID, "DCMSerDescr":reference.DCMSerDescr,
-    "WorldMatrix":reference.WorldMatrix, "VoxelSpacing":reference.VoxelSpacing }
+
+def register_image(moving, reference_image_type = "t2_tse_tra", overwrite = False):
+    """Registers two images, using data from the database and not from the .csv file
+
+    Parameters
+    ----------
+    moving: A set from of the type DB.Images. This is the target image of the registration
+    reference_image_type="t2_tse_tra": The image that will serve as the standard
+    overwrite=False: Is is set to true, in case the image has been already registered, it will delete it none the less and replace with the new
+
+    Returns
+    -------
+
+    """
+    moving = get_ref_dic_from_db(moving)
     
-    return reference
+    reference = read_patient_image(moving["ProxID"], reference_image_type)
+
+    reference = get_ref_dic_from_db(reference)
+
+    target_patient_folder = os.path.join(target_path, moving["ProxID"])
+
+    if not os.path.isdir(target_patient_folder):
+        print("{} not yet processed. Starting now".format(patient))
+        os.makedirs(target_patient_folder)
+    
+    # Load reference image 
+    ref_image, ref_affine = get_isotropic_image(reference)
+    # Check if is already exists
+    img_path = os.path.join(target_patient_folder, "{}.npy".format(reference["DCMSerDescr"]))
+    if not os.path.isfile(img_path):
+        np.save(img_path, ref_image)
+
+
+
+    moving_path = os.path.join(target_patient_folder, "{}.npy".format(moving["DCMSerDescr"]))
+
+    moving_exists = os.path.isfile(img_path)
+    if not moving_exists or overwrite:
+        print("\t Starting image {}".format(moving["DCMSerDescr"]))
+
+        moving_image, moving_affine = get_isotropic_image(moving)
+        transformed = apply_co_registration(ref_image, ref_affine, moving_image, moving_affine )
+
+        np.save(moving_path, transformed)
+
+
+def register_exam(exam_type):
+    result = read_exams(exam_type)
+
+    for a in result:
+        register_image(a, overwrite=True)
+
+    
 
 
 def register_images():
@@ -167,4 +220,4 @@ def register_images():
 
 
 if __name__ == "__main__":
-    register_images()
+    register_exam("KTrans")

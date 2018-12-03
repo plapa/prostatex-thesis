@@ -42,7 +42,25 @@ def lesion_significance(proxid, coords):
 
     return result.iloc[0]
 
+def read_patient_image(proxid, image, enforce_one = True):
+    q = s.query(Image.image_id, Image.patient_id, Image.imagetype, Image.registered, Image.voxel_spacing, Image.world_matrix).filter(Image.patient_id == proxid, Image.imagetype == image)
+
+    if enforce_one:
+        q.one()
+
+    return q.one()
+
+def read_exams(exam_type):
+    q = s.query(Image.image_id, Image.patient_id, Image.imagetype, Image.registered, Image.voxel_spacing, Image.world_matrix).filter(Image.imagetype == exam_type)
+
+    return q.all()
+
+
 
 
 if __name__ == "__main__":
-    print(lesion_significance("ProstateX-0000", (83, 112, 27)))
+    aa = read_exams("KTrans")
+
+    for a in aa:
+        print(a.imagetype)
+
