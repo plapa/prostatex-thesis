@@ -80,6 +80,7 @@ target/
 /notebooks/
 /references/
 /logs/
+/old-notebooks/
 
 # Mac OS-specific storage files
 .DS_Store
