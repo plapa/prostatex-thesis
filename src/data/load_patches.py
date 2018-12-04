@@ -4,12 +4,19 @@ import os
 
 from src.db.read import lesion_image_coordinates,  lesion_significance
 from src.data.util.utils import get_image_patch
-
+from src.helper import get_config
 
 base_path = "data/interim/train_registered/"
 
 
-def main():
+def create_dataset(padding=None, overwrite=False):
+
+    if padding is None:
+
+        padding = config["general"]["padding"]
+
+
+
     to_consider = ["tfl_3d PD ref_tra_1.5x1.5_t3", "t2_tse_tra", "ep2d_diff_tra_DYNDIST_ADC"]
 
     lesion_info = lesion_image_coordinates(to_consider)
@@ -19,12 +26,12 @@ def main():
     engroup = lesion_info.groupby(["ProxID", "ijk", "clin_sig"])
 
     i = 0
-    X = np.empty((1000, 64,64,3))
+    X = np.empty((1000, 2*padding,2*padding,3))
     y = []
 
     for patient_lesion, subdf in engroup:
         patient_folder = os.path.join(base_path, patient_lesion[0])
-        patient_image = np.empty(shape=(1,64,64,0))
+        patient_image = np.empty(shape=(1,2*padding,2*padding,0))
         for info, image in subdf.iterrows():
             file_name = "{}.npy".format(image.imagetype)
             image_path = os.path.join(patient_folder, file_name)
@@ -32,7 +39,7 @@ def main():
 
             coords = (image.reg_i, image.reg_j, image.reg_k)
 
-            file_patch = get_image_patch(image_file, coords , 32)
+            file_patch = get_image_patch(image_file, coords , padding)
             if file_patch is None:
                 patient_image = None
                 break
@@ -48,6 +55,10 @@ def main():
 
     X = X[:i]
     y = np.array(y)
+
+    if overwrite:
+        np.save("data/processed/X_36.npy", X)
+        np.save("data/processed/y_36.npy",
 
     print(X.shape)
     print(y.shape)
