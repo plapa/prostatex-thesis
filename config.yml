@@ -1,6 +1,7 @@
 meta:
   registered_path :  data/interim/train_registered/
   unregistered_path : data/interim/train/
+  exams_to_consider : ["tfl_3d PD ref_tra_1.5x1.5_t3", "t2_tse_tra", "KTrans"]
 
 general:
   channels: 3
