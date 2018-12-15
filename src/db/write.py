@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import os
 from src.db.main import engine
+from src.db.base import Base
+from src.db.tables import *
 
 metadata = pd.read_csv("data/interim/train_information.csv")
 base_path = "data/interim/train_registered/"
@@ -41,17 +43,28 @@ def load_images():
         return os.path.isfile(image_path)
     
     
-    images = metadata[["ProxID", "DCMSerDescr", "VoxelSpacing", "WorldMatrix"]].drop_duplicates(["ProxID", "DCMSerDescr"])
+    images = metadata[["ProxID", "DCMSerDescr", "VoxelSpacing", "WorldMatrix","imagetype"]].drop_duplicates(["ProxID", "DCMSerDescr"])
 
     g = lambda x: pd.Series(check_reg_img_exists(x.ProxID, x.DCMSerDescr))
 
     images[["registered"]] = images[["ProxID", "DCMSerDescr"]].apply(g, axis=1)
     
-    images.rename(columns={"ProxID" : "patient_id", "DCMSerDescr": "imagetype", "VoxelSpacing": "voxel_spacing", "WorldMatrix": "world_matrix"}, inplace=True)
+    images.rename(columns={"ProxID" : "patient_id", "DCMSerDescr": "dcmser_descr", "VoxelSpacing": "voxel_spacing", "WorldMatrix": "world_matrix", "imagetype": "image_type"}, inplace=True)
     
     images.to_sql("images", con=engine, if_exists="append", index=False)
 
+def update_image(image):
+   stmt = User.update().\
+       values(no_of_logins=(User.no_of_logins + 1)).\
+       where(User.username == form.username.data)
+   conn.execute(stmt)
+
+   stmt = Image.upfate().values(registered = True.where(Image.image_id == image["image_id"]))
+
+
 def load_all():
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
     load_patients()
     load_images()
     load_lesions()

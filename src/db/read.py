@@ -43,14 +43,18 @@ def lesion_significance(proxid, coords):
 
     return result.iloc[0]
 
-def read_patient_image(proxid = None, image = None, enforce_one = True):
-    q = s.query(Image.image_id, Image.patient_id, Image.imagetype, Image.registered, Image.voxel_spacing, Image.world_matrix)
-    
+def read_patient_image(proxid = None, image = None, enforce_one = True, is_registered = None):
+    q = s.query(Image.image_id, Image.patient_id, Image.dcmser_descr, Image.registered, Image.voxel_spacing, Image.world_matrix, Image.image_type)
+
     if proxid is not None:
         q = q.filter(Image.patient_id == proxid)
+
     
     if image is not None:
-        q = q.filter(Image.imagetype == image)
+        q = q.filter(Image.image_type == image)
+
+    if image is not None:
+        q = q.filter(Image.registered == is_registered)
 
     if enforce_one:
         q = q.first()
@@ -60,7 +64,7 @@ def read_patient_image(proxid = None, image = None, enforce_one = True):
     return q
 
 def read_exams(exam_type):
-    q = s.query(Image.image_id, Image.patient_id, Image.imagetype, Image.registered, Image.voxel_spacing, Image.world_matrix).filter(Image.imagetype == exam_type)
+    q = s.query(Image.image_id, Image.patient_id, Image.imagetype, Image.registered, Image.voxel_spacing, Image.world_matrix).filter(Image.image_type == exam_type)
     q = q.filter(cast(func.substr(Image.patient_id,11,15), Integer) >= 190)
     return q.all()
 
