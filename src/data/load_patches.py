@@ -15,7 +15,7 @@ base_path = config["meta"]["registered_path"]
 
 
 
-def create_dataset(overwrite=False):
+def create_dataset(overwrite=False, note = ""):
 
     # Just loading some of the general configurations
     padding = config["general"]["padding"]
@@ -87,10 +87,10 @@ def create_dataset(overwrite=False):
     print("y SHAPE: {}".format(y.shape))
 
     if overwrite:
-        PRINT("SAVING AND OVERWRITING EXISTING FILES")
-        np.save("data/processed/X.npy", X)
-        np.save("data/processed/y.npy", y)
+        print("SAVING AND OVERWRITING EXISTING FILES")
+        np.save("data/processed/X_{}.npy".format(note), X)
+        np.save("data/processed/y_{}.npy".format(note), y)
 
 
 if __name__ == "__main__":
-    create_dataset()
+    create_dataset(True, "tf_t2_kt")

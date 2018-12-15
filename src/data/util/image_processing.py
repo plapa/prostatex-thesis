@@ -15,6 +15,7 @@ from dipy.align.transforms import (TranslationTransform3D,
 
 from src.helper import get_config
 
+from src.utils.utils import HiddenPrints
 
 config = get_config()
 

@@ -47,19 +47,42 @@ def get_image_patch(img_array, coords, padding=None):
             return np.asarray(X_).reshape((1,2*padding,2*padding, 1))
 
 
-
-
-
 def get_ref_dic_from_pd(reference):
-
     reference = {"ProxID":reference.ProxID, "DCMSerDescr":reference.DCMSerDescr,
-    "WorldMatrix":reference.WorldMatrix, "VoxelSpacing":reference.VoxelSpacing }
+    "WorldMatrix":reference.WorldMatrix, "VoxelSpacing":reference.VoxelSpacing,
+    "ImageType" : reference.ImageType }
     
     return reference
 
 def get_ref_dic_from_db(reference):
-
-    reference = {"ProxID":reference.patient_id, "DCMSerDescr":reference.imagetype,
+    reference = {"ProxID":reference.patient_id, "DCMSerDescr":reference.dcmser_descr,
+    "ImageType": reference.image_type,
     "WorldMatrix":reference.world_matrix, "VoxelSpacing":reference.voxel_spacing }
     
     return reference
+
+
+def get_exam_strings(a, substr):
+    images = []
+    unique_values = a.unique()
+
+    for c in unique_values:
+        if substr.upper() in c.upper():
+            images.append(c)
+    return images
+
+
+def get_dict_replace(wrong, right):
+    tmp = dict()
+    for k in wrong:
+        tmp[str(k)] = right
+    return tmp
+
+def replace_values_inplace(df, dic):
+    return df.replace(dic, inplace=False)
+
+def replace_wrapper(column, search, new_value):
+    images = get_exam_strings(column, search)
+    dic = get_dict_replace(images, new_value)
+    replace = replace_values_inplace(column, dic)
+    return replace

@@ -81,6 +81,13 @@ target/
 /references/
 /logs/
 /old-notebooks/
+notebooks-thesis/
+
+
+config.yml
+config.yml.default
+search_params.yml
+
 
 # Mac OS-specific storage files
 .DS_Store
