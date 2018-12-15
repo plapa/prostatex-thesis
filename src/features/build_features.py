@@ -5,6 +5,17 @@ from src.features.transformations import normalize_01, normalize_meanstd, create
 
 
 def apply_rescale(X):
+    """Normalizes a given dataset.
+
+    Parameters
+    ----------
+    X: A numpy array of type (n, w, h, c)
+
+    Returns
+    -------
+    X_: X after applying normalization
+
+    """
     config = get_config()
     if config["preprocessing"]["rescale"]:
         
@@ -30,8 +41,6 @@ def apply_transformations(X = None, y = None, save = False):
         X = np.load("data/processed/X_2c.npy")
         y = np.load("data/processed/y_2c.npy")
 
-
-    # X_ = apply_rescale(X)
 
     aug = create_augmenter()
 
@@ -59,36 +68,13 @@ def apply_transformations(X = None, y = None, save = False):
         np.save("data/processed/y_a.npy", y_)
     return X_aug, y_
 
-def create_train_val_set(X = None, y = None):
-    config = get_config()
-
-    if X is None:
-        X = np.load("data/processed/X_2c.npy")
-        y = np.load("data/processed/y_2c.npy")
-
-    train_samples = round(X.shape[0] * config["train"]["train_val_split"])
-
-    X_train = X[:train_samples,: ,:,:]
-    X_val = X[train_samples:, :,::]
-
-    y_train = y[:train_samples]
-    y_val = y[train_samples:]
-
-
-    return X_train, X_val, y_train, y_val
 
 def create_augmented_dataset(X = None, y = None,save=False, return_data = False):
     config = get_config()
 
-    if X is None:
-        X_train, X_val, y_train, y_val = create_train_val_set()
-    else:
-        X_train, X_val, y_train, y_val = create_train_val_set(X, y)
 
+    X_, y_ = apply_transformations(X, y)
 
-    X_train, y_train = apply_transformations(X_train, y_train)
-
-    X_val = apply_rescale(X_val)
 
     if save:
         np.save("data/processed/X_train.npy", X_train)
@@ -98,7 +84,7 @@ def create_augmented_dataset(X = None, y = None,save=False, return_data = False)
         np.save("data/processed/y_val.npy", y_val)
 
     if return_data:
-        return X_train, X_val, y_train, y_val
+        return X_, y_
 
 if __name__ == "__main__":
 

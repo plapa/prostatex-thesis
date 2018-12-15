@@ -9,14 +9,37 @@ def normalize_meanstd(x, axis=(1,2)):
     # axis param denotes axes along which mean & std reductions are to be performed
     mean = np.mean(x, axis=axis, keepdims=True)
     std = np.sqrt(((x - mean)**2).mean(axis=axis, keepdims=True))
-    return (x - mean) / std
+
+
+    for i in range(x.shape[0]):
+        mean = np.mean(x[i], axis=(0,1), keepdims=True)
+        std = np.sqrt(((x[i] - mean)**2).mean(axis=(0,1), keepdims=True))
+
+        if(np.any(std==0)):
+            std[std==0]= 0.0000000001
+        
+        x[i] = (x[i] - mean) / std
+
+    return x
 
 
 def normalize_01(x, axis=None):
     x_min = x.min(axis=(1, 2), keepdims=True)
     x_max = x.max(axis=(1, 2), keepdims=True)
 
-    return (x - x_min)/(x_max-x_min)
+    for i in range(x.shape[0]):
+        x_min = x[i].min(axis=(0, 1), keepdims=True)
+        x_max = x[i].max(axis=(0, 1), keepdims=True)
+
+        if(np.any(x_max - x_max==0)):
+            x_max[x_max==x_min]= x_max[x_max==x_min] + 0.0000000001
+
+        
+        x[i] = (x[i] - x_min)/(x_max-x_min)
+
+
+
+    return x
 
 def create_augmenter():
     seq = iaa.Sequential([
