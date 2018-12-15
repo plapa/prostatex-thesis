@@ -2,10 +2,7 @@ import numpy as np
 import json
 import itertools
 import random
-
-
 from src.helper import get_config
-from src.models.train_model import train_model
 
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -18,7 +15,7 @@ class NumpyEncoder(json.JSONEncoder):
         else:
             return super(NumpyEncoder, self).default(obj)
 
-def log_model(model, c_backs, config=None):
+def log_model(model, c_backs, metrics_dic, config=None):
     """ Description
     :type model: Keras model
     :param model:
@@ -46,6 +43,7 @@ def log_model(model, c_backs, config=None):
 
     log = dict()
     log["datetime"] = {'date': now.strftime("%Y-%m-%d %H:%M"), 'unix' : now.timestamp()}
+    log["metric"] = metrics_dic
 
     hist = model.history.history
     hist["epoch"] = model.history.epoch
@@ -69,29 +67,33 @@ def log_model(model, c_backs, config=None):
         json.dump(log, fp, cls=NumpyEncoder)
 
 
-def split_train_val(X, y, frac = 0.75, seq = False):
-    n_samples = y.shape[0]
-    train_size = round(n_samples * frac)
+def split_train_val(X, y, prc = 0.75, seed = None):
+
+
+    rnd = np.random.RandomState(seed)
     
+    n_pos = sum(y==True)
+    n_neg = sum(y==False)
+    total = len(y)
 
-    if not seq: 
-        train_samples = np.random.choice(n_samples, size = train_size, replace=False)
-        print(train_samples)
+    X_pos = X[y==True]
+    X_neg = X[y!=True]
 
-        X_train = X[train_samples,: ,:,:]
-        X_val = X[~train_samples, :,:, :]
 
-        y_train = y[train_samples]
-        y_val = y[~train_samples]
+    n_pos_train = int(n_pos*prc)
+    n_neg_train = int(n_neg*prc)
 
-    else:
-        X_train = X[:train_size,: ,:,:]
-        X_val = X[train_size:, :,::]
+    n_pos_val = n_pos - n_pos_train
+    n_neg_val = n_neg - n_neg_train
 
-        y_train = y[:train_size]
-        y_val = y[train_size:]
+    p = rnd.choice(n_pos,n_pos_train,replace= False)
+    n = rnd.choice(n_neg, n_neg_train, replace=False)
 
-    print("X_val: {} X_train: {} y_val: {}, y_train: {}".format(X_val.shape, X_train.shape, y_val.shape, y_train.shape))
+    X_train = np.concatenate((X_pos[p], X_neg[n]))
+    y_train = np.concatenate((np.full(shape= n_pos_train, fill_value=True), np.full(shape= n_neg_train, fill_value=False)))
+
+    X_val = np.concatenate((np.delete(X_pos, p, 0), np.delete(X_neg, n, 0)))
+    y_val = np.concatenate((np.full(shape= n_pos_val, fill_value=True), np.full(shape= n_neg_val, fill_value=False)))
 
     return X_train, X_val, y_train, y_val
 
@@ -142,6 +144,13 @@ def gen_combinations(d):
 def rename_file(src_file, dst_file):
     import shutil
     shutil.copy(src_file, dst_file)
+
+def calculate_roc(model, X, y):
+    from sklearn.metrics import roc_auc_score
+
+    y_pred = model.predict(X)
+
+    return(roc_auc_score(y, y_pred))
 
 
 

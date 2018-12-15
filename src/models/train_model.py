@@ -5,42 +5,40 @@ import keras
 from keras.metrics import *
 from keras.preprocessing.image import ImageDataGenerator
 import tensorflow as tf
-
-
-
+from keras import backend as K
 from src.helper import get_config
 from src.models.util.callbacks import Metrics
 
 
 from src.models.util.optimizers import load_optimizer
 from src.models.util.callbacks import load_callbacks
-# from src.models.util.utils import split_train_val, log_model, load_architecture, reservoir_sample, rename_file, gen_combinations
+
 from src.models.util.utils import *
-from src.features.build_features import apply_transformations, create_augmented_dataset, apply_rescale
+from src.features.build_features import  create_augmented_dataset, apply_rescale
 # Image size: 256, 256, 1
 # 1, 2, 8, 16, 32, 64, 128, 256, 512
 
+config = get_config()
+global current 
+current = 0
 
-def train_model(current = 0):
-    # X_train = np.load("data/processed/X_train.npy")
-    # X_val = np.load("data/processed/X_val.npy")
+def train_model():
+    global current
 
-    # y_train  = np.load("data/processed/y_train.npy")
-    # y_val  = np.load("data/processed/y_val.npy")
+    X = np.load("data/processed/X_tf_t2_kt.npy")
+    y = np.load("data/processed/y_tf_t2_kt.npy")
 
-    X = np.load("data/processed/X_36.npy")
-    y = np.load("data/processed/y_36.npy")
+    X_train, X_val, y_train, y_val = split_train_val(X = X, y = y, seed = 42)
 
-    X_train, X_val, y_train, y_val = create_augmented_dataset(X = X, y = y, return_data=True)
+    if(config["train"]["use_augmentation"]):
+        X_train, y_train = create_augmented_dataset(X_train, y_train)
 
     X_train = apply_rescale(X_train)
     X_val = apply_rescale(X_val)
 
-    config = get_config()
+
     arc = load_architecture(config["train"]["optimizers"]["architecture"])
     model = arc.architecture()
-
-    # model.summary()
 
     print(" ################################## ")
     print(" #      MODEL CONFIGURATION       # ")
@@ -50,61 +48,48 @@ def train_model(current = 0):
         print( str(k) + ":" + str(config["train"]["optimizers"][k]))
     print(" ################################## ")
 
-
-
     c_backs = load_callbacks(arc.weights_path)
     opt = load_optimizer()
 
     model.compile( optimizer=opt, loss='binary_crossentropy')
+    model.fit(X_train, y_train,
+            batch_size=config["train"]["batch_size"],
+            epochs=config["train"]["epochs"],
+            validation_data=(X_val, y_val),
+            shuffle=True,
+            callbacks=c_backs)
+
+    best_model = arc.architecture()
+    best_model.load_weights(arc.weights_path)
 
 
-    if(config["train"]["use_augmentation"]):
-        train_datagen = ImageDataGenerator(
-            featurewise_center=True,
-            featurewise_std_normalization=True,
-            rotation_range=20,
-            width_shift_range=0.2,
-            height_shift_range=0.2,
-            horizontal_flip=True)
-
-        train_datagen.fit(X_train)
-
-        train_generator = train_datagen.flow(X_train, y_train, batch_size=config["train"]["batch_size"])
-
-        val_datagen = ImageDataGenerator(
-            featurewise_center=True,
-            featurewise_std_normalization=True,
-        )
-
-        val_datagen.fit(X_val)
-
-        val_generator = val_datagen.flow(X_val, y_val, batch_size=config["train"]["batch_size"])
-
-        model.fit_generator(train_generator,
-                        steps_per_epoch=len(X_train) / config["train"]["batch_size"],
-                        epochs=config["train"]["epochs"],
-                        validation_data=val_generator,
-                        validation_steps = len(X_val) / config["train"]["batch_size"],
-                        shuffle=True,
-                        callbacks=c_backs )
-    else:
-        model.fit(X_train, y_train,
-                batch_size=config["train"]["batch_size"],
-                epochs=config["train"]["epochs"],
-                validation_data=(X_val, y_val),
-                shuffle=True,
-                callbacks=c_backs)
-
+    roc_train = calculate_roc(best_model, X_train, y_train)
+    roc_val = calculate_roc(best_model, X_val, y_val)
+    metric_dick = {"AUROC" : {"TRAIN" : roc_train, "VAL" : roc_val}}
     log_model(model, c_backs, config)
 
-if __name__ == "__main__":
-    grid_search = True
+    print("ROC TRAIN: {}".format(calculate_roc(model, X_train, y_train)))
+    print("ROC VAL: {}".format(calculate_roc(model, X_val, y_val)))
 
-    if grid_search == False:
+
+    print("ROC TRAIN: {}".format(roc_train))
+    print("ROC VAL: {}".format(roc_val))
+
+    K.clear_session()
+
+
+def search():
+
+    tf_config = tf.ConfigProto()
+    tf_config.gpu_options.allow_growth = True
+    sess = tf.Session(config = tf_config)
+
+    tf.logging.set_verbosity(tf.logging.ERROR)
+
+    if config["train"]["use_gridsearch"] == False:
         train_model()
-
     else:
-        config = get_config()
+        global current
         with open("search_params.yml", 'r') as ymlfile:
             grid_search = yaml.load(ymlfile)
 
@@ -112,10 +97,9 @@ if __name__ == "__main__":
 
         sample = reservoir_sample(gen_combinations(grid_search["train"]["optimizers"]), 10)
 
-        i = 0
 
         for s in sample:
-            i = i + 1
+            current = current + 1
 
             for key in s:
                 if key in config["train"]["optimizers"].keys():
@@ -124,8 +108,14 @@ if __name__ == "__main__":
             with open('config.yml', 'w') as outfile:
                 yaml.dump(config, outfile, default_flow_style=False)
 
-                try:
-                    train_model(current = i)
-                    rename_file('config.yml.default', 'config.yml')
-                except:
-                    print("Error occured")
+                train_model()
+                rename_file('config.yml.default', 'config.yml')
+                # try:
+                #     train_model(current = i)
+                #     rename_file('config.yml.default', 'config.yml')
+                # except:
+                #     print("Error occured")
+
+if __name__ == "__main__":
+    search()
+
