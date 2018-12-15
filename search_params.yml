@@ -1,6 +1,9 @@
 train:
     optimizers:
-        architecture : [xmasnet, resnet, fccn]
-        use : [sgd, adam, rmsprop]
-        lr : [0.01, 0.001, 0.00001]
-        momentum : [0.00, 0.2, 0.7, 0.9]
+        architecture : [resnet]
+        use : [rmsprop, sgd, adam]
+        lr : [0.01]
+        momentum : [0.00, 0.7, 0.9]
+        rho :  [0.00, 0.7, 0.9]
+        decay : [0.00, 0.7,0.8, 0.9, 0.99]
+        nesterov : [True, False]

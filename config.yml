@@ -1,26 +1,28 @@
-meta:
-  registered_path :  data/interim/train_registered/
-  unregistered_path : data/interim/train/
-  exams_to_consider : ["tfl_3d PD ref_tra_1.5x1.5_t3", "t2_tse_tra", "KTrans"]
-
 general:
   channels: 3
   padding: 32
+meta:
+  exams_to_consider:
+  - tfl_3d PD ref_tra_1.5x1.5_t3
+  - t2_tse_tra
+  - KTrans
+  registered_path: data/interim/train_registered/
+  unregistered_path: data/interim/train/
 preprocessing:
   apply: true
   augmented_ds_size: 300
   interpolation: cubic
   rescale: true
-  rescale_method: standartize
+  rescale_method: normalize
 train:
   batch_size: 16
   callbacks:
     early_stopping:
       apply: true
-      min_delta: 1.0e-06
+      min_delta: 0.0001
       mode: auto
       monitor: val_loss
-      patience: 15
+      patience: 8
       use_default_params: false
       verbose: 1
     lr_reduce:
@@ -33,15 +35,16 @@ train:
       patience: 5
       use_default_params: false
       verbose: 2
-  epochs: 100
+  epochs: 150
   optimizers:
     amsgrad: false
     architecture: resnet
-    decay: 0.001
+    decay: 0.7
     lr: 0.01
     momentum: 0.7
     nesterov: true
-    use: rmsprop
+    use: sgd
     use_default_params: false
   train_val_split: 0.7
   use_augmentation: false
+  use_gridsearch: false
