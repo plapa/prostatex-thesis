@@ -12,18 +12,16 @@ from src.models.util.callbacks import Metrics
 
 from src.models.util.optimizers import load_optimizer
 from src.models.util.callbacks import load_callbacks
-
+from src.models.util.intermediate_output import save_results
 from src.models.util.utils import *
 from src.features.build_features import  create_augmented_dataset, apply_rescale
-# Image size: 256, 256, 1
-# 1, 2, 8, 16, 32, 64, 128, 256, 512
+
 
 config = get_config()
 global current 
 current = 0
 
 def train_model():
-    global current
 
     X = np.load("data/processed/X_tf_t2_kt.npy")
     y = np.load("data/processed/y_tf_t2_kt.npy")
@@ -39,6 +37,8 @@ def train_model():
 
     arc = load_architecture(config["train"]["optimizers"]["architecture"])
     model = arc.architecture()
+
+    print("#####################################")
 
     print(" ################################## ")
     print(" #      MODEL CONFIGURATION       # ")
@@ -57,7 +57,8 @@ def train_model():
             epochs=config["train"]["epochs"],
             validation_data=(X_val, y_val),
             shuffle=True,
-            callbacks=c_backs)
+            callbacks=c_backs,
+            verbose = 1)
 
     best_model = arc.architecture()
     best_model.load_weights(arc.weights_path)
@@ -67,8 +68,7 @@ def train_model():
     roc_val = calculate_roc(best_model, X_val, y_val)
     metric_dick = {"AUROC" : {"TRAIN" : roc_train, "VAL" : roc_val}}
     log_model(model, c_backs, config)
-
-
+    save_results(best_model, 'flatten_2', arc.name , X, y)
 
     print("ROC TRAIN: {}".format(roc_train))
     print("ROC VAL: {}".format(roc_val))

@@ -104,6 +104,7 @@ def load_architecture(arch):
     from src.models.architectures.XMASNET import XmasNet
     from src.models.architectures.ALEXNET import AlexNet
     from src.models.architectures.ResNet import ResNet
+    from src.models.architectures.DenseNet import DenseNet
 
     arch = arch.lower()
     if arch == "fccn":
@@ -116,6 +117,8 @@ def load_architecture(arch):
         return AlexNet()
     elif arch == "resnet":
         return ResNet()
+    elif arch == "densenet":
+        return DenseNet()
     else:
         print("Arch: {} is not valid. Returning fccn.".format(arch))
         return FCCN()

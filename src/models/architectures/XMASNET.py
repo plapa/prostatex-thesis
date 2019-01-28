@@ -8,6 +8,7 @@ from keras.layers import Conv2D, Conv2DTranspose, MaxPool2D, Dense, Flatten, Dro
 class XmasNet(BaseArchitecture):
 
     name = "XmasNet"
+    flaten_layer = "flatten_1"
     def architecture(self):
         model = Sequential()
 

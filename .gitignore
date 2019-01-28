@@ -88,6 +88,6 @@ config.yml
 config.yml.default
 search_params.yml
 
-
+models/
 # Mac OS-specific storage files
 .DS_Store

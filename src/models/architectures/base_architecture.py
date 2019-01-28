@@ -5,6 +5,7 @@ class BaseArchitecture():
     weights_directory= "data/interim/weights/"
 
     name = "Base Architecture"
+    flaten_layer = None
 
     config = get_config()
     input_shape = (2 * config["general"]["padding"], 2 * config["general"]["padding"], config["general"]["channels"] )
