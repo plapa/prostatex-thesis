@@ -59,7 +59,7 @@ def update_image(image):
        where(User.username == form.username.data)
    conn.execute(stmt)
 
-   stmt = Image.upfate().values(registered = True.where(Image.image_id == image["image_id"]))
+   stmt = Image.update().values(registered = True.where(Image.image_id == image["image_id"]))
 
 
 def load_all():

@@ -31,7 +31,7 @@ def train_model():
     X_train, X_val, y_train, y_val = split_train_val(X = X, y = y, seed = 42)
 
     if(config["train"]["use_augmentation"]):
-        X_train, y_train = create_augmented_dataset(X_train, y_train)
+        X_train, y_train = create_augmented_dataset(X_train, y_train, return_data=True)
 
     X_train = apply_rescale(X_train)
     X_val = apply_rescale(X_val)
@@ -68,8 +68,6 @@ def train_model():
     metric_dick = {"AUROC" : {"TRAIN" : roc_train, "VAL" : roc_val}}
     log_model(model, c_backs, config)
 
-    print("ROC TRAIN: {}".format(calculate_roc(model, X_train, y_train)))
-    print("ROC VAL: {}".format(calculate_roc(model, X_val, y_val)))
 
 
     print("ROC TRAIN: {}".format(roc_train))

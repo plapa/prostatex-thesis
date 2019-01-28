@@ -11,11 +11,12 @@ base_path = "data/interim/train_registered/"
 
 config = get_config()
 
-base_path = config["meta"]["registered_path"]
 
 
 
 def create_dataset(overwrite=False, note = ""):
+    ''' According to each modalitie chosen, it well fetch the lesions and the images from the databaset, create a patch and then merge that into a numpy file
+    '''
 
     # Just loading some of the general configurations
     padding = config["general"]["padding"]
@@ -25,7 +26,7 @@ def create_dataset(overwrite=False, note = ""):
     # Also some patients have the same lesion more than once, so we need to only choose one
     lesion_info = lesion_image_coordinates(to_consider)
     lesion_info["ijk"] = lesion_info[["reg_i", "reg_j", "reg_k"]].apply(lambda x: ''.join(str(x.values)), axis=1)
-    lesion_info = lesion_info.drop_duplicates(["ProxID", "imagetype", "ijk"])
+    lesion_info = lesion_info.drop_duplicates(["ProxID", "image_type", "ijk"])
 
     # Just creating some variable to store descriptive information
     n_existing_patients = lesion_info.drop_duplicates(["ProxID"]).shape[0]
@@ -48,7 +49,7 @@ def create_dataset(overwrite=False, note = ""):
         lesion_image = np.empty(shape=(1,2*padding,2*padding,0))
 
         for info, image in subdf.iterrows():
-            file_name = "{}.npy".format(image.imagetype)
+            file_name = "{}.npy".format(image.dcmser_descr)
             image_path = os.path.join(patient_folder, file_name)
             image_file = np.load(image_path)
 
@@ -93,4 +94,6 @@ def create_dataset(overwrite=False, note = ""):
 
 
 if __name__ == "__main__":
-    create_dataset(True, "tf_t2_kt")
+    #create_dataset(True, "tf_t2_kt")
+
+    create_dataset(True, "t2_PD_ADC")

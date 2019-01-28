@@ -5,6 +5,8 @@ import numpy as np
 
 from src.helper import get_config
 
+
+config = get_config()
 def normalize_meanstd(x, axis=(1,2)): 
     # axis param denotes axes along which mean & std reductions are to be performed
     mean = np.mean(x, axis=axis, keepdims=True)
@@ -42,31 +44,47 @@ def normalize_01(x, axis=None):
     return x
 
 def create_augmenter():
-    seq = iaa.Sequential([
-        iaa.Crop(px=(0, 8)), # crop images from each side by 0 to 16px (randomly chosen)
-        iaa.Fliplr(0.5), # horizontally flip 50% of the images
-        
-        iaa.SomeOf((0,3), [
-            iaa.Fliplr(1),
-            iaa.Flipud(1),
+
+    hist_use = config["preprocessing"]["augmentation"]["histogram_method"]
+
+    if hist_use == "rescale":
+        hist_fun = RescaleIntensity
+    elif hist_use == "CLAHE":
+        hist_fun = iaa.CLAHE
+    elif hist_use == "hist_equalization":
+        hist_fun = iaa.AllChannelsHistogramEqualization
+    else:
+        hist_fun = None
+    print("AAAA")
+
+    list_augmenters = [
+        iaa.SomeOf((0,5), [
+            iaa.Affine(scale=(0.9, 1), mode="symmetric"),
+            iaa.Affine(translate_percent=(0, 0.1), mode="symmetric"),
+            iaa.Affine(rotate=(-15, 15), mode="symmetric"),
+            iaa.Affine(shear=(-5, 5), mode="symmetric")
         ]),
+
         
         iaa.SomeOf((0,1),[
-            iaa.GaussianBlur(sigma=(0, 0.5)), # blur images with a sigma of 0 to 3.0
+            iaa.GaussianBlur(sigma=(0, 0.5)), # blur images with a sigma of 0 to 0.5
             iaa.AverageBlur(k=(1, 3)),
             iaa.MedianBlur(k=1),
 
         ]),
         
-        iaa.SomeOf((0,2), [
-        iaa.SaltAndPepper(0.01, per_channel=True),
-        iaa.Dropout(p=0.01, per_channel=True),
-        iaa.OneOf([iaa.Multiply((0.5, 1.5)),
-        iaa.Multiply((0.5, 1.5), per_channel=0.5)]),
-        RescaleIntensity(per_channel= False)
-        
-        ])
-    ])
+        iaa.SomeOf( (0,2),[
+        iaa.SaltAndPepper((0, 0.015), per_channel=True),
+        iaa.OneOf([iaa.Multiply((0.9, 1.1)),
+        iaa.Multiply((0.9, 1.1), per_channel=0.5)])
+        ]
+        )
+    ]
+
+    if hist_fun is not None:
+        list_augmenters = list_augmenters + hist_fun(per_channel=False)
+    
+    seq = iaa.SomeOf((0, 5), list_augmenters)
 
     return seq
 
@@ -124,3 +142,38 @@ class RescaleIntensity(Augmenter):
 
     def get_parameters(self):
         return [self.p]
+
+
+if __name__ == "__main__":
+    import matplotlib.pyplot as plt
+    import string
+    alphabet = string.ascii_lowercase
+
+    X = np.load("data/processed/X_tf_t2_kt.npy")
+    y = np.load("data/processed/y_tf_t2_kt.npy")
+
+    X = normalize_01(X)
+
+    _augmenter = create_augmenter()
+
+    fig = plt.figure()
+    X_ = X[25]
+
+    ax = fig.add_subplot(3,3,1)
+    ax.imshow(X_, cmap="Greys_r")
+    ax.set_title(alphabet[0])
+    ax.axis('off')
+
+    for i in range(2, 10):
+        x_augmented = _augmenter.augment_image(X_)
+        ax = fig.add_subplot(3,3,i)
+
+        ax.imshow(x_augmented, cmap="Greys_r")
+        ax.axis('off')
+        ax.set_title(alphabet[i-1])
+
+    plt.tight_layout()
+    plt.show()
+    #plt.savefig('/home/paulo/Projects/thesis/LaTeX/Chapters/Figures/chapter3/augmentations.pdf')
+
+
