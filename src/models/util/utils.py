@@ -2,6 +2,9 @@ import numpy as np
 import json
 import itertools
 import random
+import os
+import datetime
+
 from src.helper import get_config
 
 class NumpyEncoder(json.JSONEncoder):
@@ -66,6 +69,12 @@ def log_model(model, c_backs, metrics_dic, config=None):
     with open(file_path, 'a+') as fp:
         json.dump(log, fp, cls=NumpyEncoder)
 
+def log_models_tries(log_dic):
+    now = datetime.datetime.now()
+    file_path = os.path.join('logs', now.strftime("log_%Y_%m_%d_%H_%M.json"))
+
+    with open(file_path, 'a+') as fp:
+        json.dump(log_dic, fp, cls=NumpyEncoder)
 
 def split_train_val(X, y, prc = 0.75, seed = None):
 
@@ -153,7 +162,25 @@ def calculate_roc(model, X, y):
 
     y_pred = model.predict(X)
 
-    return(roc_auc_score(y, y_pred))
+    return float(roc_auc_score(y, y_pred))
+
+def calculate_cross_entropy(model, y_true, X_pred):
+    from keras.metrics import binary_crossentropy
+    from keras import backend as K
+
+    y_true = np.asarray(y_true).astype('float32').reshape((-1,1))
+    y_true = K.variable(y_true)
+
+    y_pred = model.predict(X_pred)
+    y_pred = np.asarray(y_pred).astype('float32').reshape((-1,1))
+    y_pred = K.variable(model.predict(X_pred))
+
+    error = K.eval(binary_crossentropy(y_true, y_pred))
+
+    mean_error = float(np.mean(error))
+
+    return mean_error
+
 
 
 

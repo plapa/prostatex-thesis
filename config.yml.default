@@ -3,9 +3,9 @@ general:
   padding: 32
 meta:
   exams_to_consider:
-  - tfl_3d PD ref_tra_1.5x1.5_t3
   - t2_tse_tra
-  - KTrans
+  - PD
+  - ADC_tra
   layers_path: models/intermediate_outputs/
   registered_path: data/interim/train_registered/
   unregistered_path: data/interim/train/
@@ -24,7 +24,7 @@ train:
       apply: true
       min_delta: 0.001
       mode: auto
-      monitor: val_loss
+      monitor: loss
       patience: 5
       use_default_params: false
       verbose: 1
@@ -38,15 +38,17 @@ train:
       patience: 5
       use_default_params: false
       verbose: 2
-  epochs: 350
+  epochs: 10
+  gridsearch_number_tries: 40
+  n_runs: 5
   optimizers:
     amsgrad: false
-    architecture: vgg16
-    decay: 0
-    lr: 0.0001
+    architecture: xmasnet
+    decay: 0.999
+    lr: 0.001
     momentum: 0.999
     nesterov: true
-    use: sgd
+    use: rmsprop
     use_default_params: false
   train_val_split: 0.7
   use_augmentation: false
