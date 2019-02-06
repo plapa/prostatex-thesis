@@ -1,4 +1,3 @@
-from skimage import exposure
 import numpy as np
 
 from src.helper import get_config
@@ -9,6 +8,8 @@ config = get_config()
 if config["preprocessing"]["use_augmentation"]:
     from imgaug import augmenters as iaa
     from imgaug.augmenters import Augmenter
+    from skimage import exposure
+
 
 def normalize_meanstd(x, axis=(1,2)): 
     # axis param denotes axes along which mean & std reductions are to be performed
