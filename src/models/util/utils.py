@@ -69,9 +69,9 @@ def log_model(model, c_backs, metrics_dic, config=None):
     with open(file_path, 'a+') as fp:
         json.dump(log, fp, cls=NumpyEncoder)
 
-def log_models_tries(log_dic):
+def log_models_tries(log_dic, id):
     now = datetime.datetime.now()
-    file_path = os.path.join('logs', now.strftime("log_%Y_%m_%d_%H_%M.json"))
+    file_path = os.path.join('logs', now.strftime("log_{}_%Y_%m_%d_%H_%M.json".format(id)))
 
     with open(file_path, 'a+') as fp:
         json.dump(log_dic, fp, cls=NumpyEncoder)

@@ -6,6 +6,9 @@ from keras.metrics import *
 from keras.preprocessing.image import ImageDataGenerator
 import tensorflow as tf
 from keras import backend as K
+import pandas as pd
+import datetime
+
 from src.helper import get_config
 from src.models.util.callbacks import Metrics
 
@@ -17,10 +20,16 @@ from src.models.util.utils import *
 from src.features.build_features import  create_augmented_dataset, apply_rescale
 
 
+
+from keras.backend.tensorflow_backend import set_session
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+config.gpu_options.visible_device_list = "0" #only the gpu 0 is allowed
+set_session(tf.Session(config=config))
+
 config = get_config()
 global current 
 current = 0
-
 X = np.load("data/processed/X_t2_PD_ADC.npy")
 y = np.load("data/processed/y_t2_PD_ADC.npy")
 
@@ -30,18 +39,19 @@ X_train, X_test, y_train, y_test = split_train_val(X = X, y = y, prc = .8, seed 
 
 X_train, X_val, y_train, y_val = split_train_val(X = X_train, y = y_train, prc = .75, seed = 42)
 
-if(config["train"]["use_augmentation"]):
+if(config["preprocessing"]["use_augmentation"]):
     X_train, y_train = create_augmented_dataset(X_train, y_train, return_data=True)
 
+
+X_train = np.concatenate((X_train, X_val))
+y_train = np.concatenate((y_train, y_val))
 X_train = apply_rescale(X_train)
 X_test = apply_rescale(X_test)
 X_val = apply_rescale(X_val)
 
 
 def train_model():
-
-    print("#####################################")
-
+    logs = pd.DataFrame()
     print(" ################################## ")
     print(" #      MODEL CONFIGURATION       # ")
 
@@ -50,24 +60,38 @@ def train_model():
         print( str(k) + ":" + str(config["train"]["optimizers"][k]))
     print(" ################################## ")
 
-    for _ in range(config["train"]["n_runs"]):
-
+    for experiment_run in range(config["train"]["n_runs"]):
         arc = load_architecture(config["train"]["optimizers"]["architecture"])
         model = arc.architecture()
         c_backs = load_callbacks(arc.weights_path)
         opt = load_optimizer()
 
+        
         model.compile( optimizer=opt, loss='binary_crossentropy')
-        model.fit(X_train, y_train,
-                batch_size=config["train"]["batch_size"],
-                epochs=config["train"]["epochs"],
-                validation_data=(X_val, y_val),
-                shuffle=True,
-                callbacks=c_backs,
-                verbose = 1)
+        start = datetime.datetime.now()
+
+        if config["train"]["fit_model"]:
+            model.fit(X_train, y_train,
+                    batch_size=config["train"]["batch_size"],
+                    epochs=config["train"]["epochs"],
+                    validation_data=(X_val, y_val),
+                    shuffle=True,
+                    callbacks=c_backs,
+                    verbose = 0)
+
+        end = datetime.datetime.now()
+        dif = end - start
+
+        print("EXPERIMENT: {}".format(experiment_run))
+        print("TRAIN LOSS {}".format(b_train_loss))
+        print("VAL LOSS {}".format(b_val_loss))
+        print("TEST LOSS {}".format(b_test_loss))
 
         best_model = arc.architecture()
         best_model.load_weights(arc.weights_path)
+
+
+        best_model = model
 
 
         roc_train = calculate_roc(best_model, X_train, y_train)
@@ -83,35 +107,24 @@ def train_model():
         b_val_roc = roc_val
         b_test_roc = calculate_roc(best_model, X_test, y_test)
 
-        best_config = dict()
-        best_config["params"] = config["train"]["optimizers"].copy()
 
-        best_config["metrics"] = dict()
-        best_config["metrics"]["roc"] = dict()
-        best_config["metrics"]["roc"]["train"] = b_train_roc
-        best_config["metrics"]["roc"]["test"] = b_test_roc
-        best_config["metrics"]["roc"]["val"] =  b_val_roc
+        if config["train"]["save_intermediate_outputs"]:
+            label = "best_{}_{}".format(arc.name, experiment_run)
+            save_results_wrapper(best_model, best_config, 'flatten_1', label, X_train, y_train, X_test, y_test, X_val, y_val)
 
-        best_config["metrics"]["loss"] = dict()
-        best_config["metrics"]["loss"]["train"] = b_train_loss
-        best_config["metrics"]["loss"]["test"] = b_test_loss
-        best_config["metrics"]["loss"]["val"] =  b_val_loss
-        print("TRAIN LOSS {}".format(b_train_loss))
-        print("VAL LOSS {}".format(b_val_loss))
-        print("TEST LOSS {}".format(b_test_loss))
+        log_row = {"id" : experiment_run, "metrics.time" : dif.total_seconds(), "metrics.loss.train":  b_train_loss, "metrics.loss.test": b_test_loss, "metrics.loss.val": b_val_loss, "metrics.roc.train" : b_train_roc, "metrics.roc.test" : b_test_roc, "metrics.roc.val" : b_val_roc}
 
-        #save_results_wrapper(best_model, best_config, 'flatten_2', arc.name , X_train, y_train, X_test, y_test, X_val, y_val)
-        log_models_tries(best_config)
-        # print("ROC TRAIN: {}".format(roc_train))
-        # print("ROC VAL: {}".format(roc_val))
+        for key, value in config["train"]["optimizers"].items():
+            log_row[key] = value
+        logs = logs.append(log_row, ignore_index=True)
 
-        # metric_dick = {"AUROC" : {"TRAIN" : roc_train, "VAL" : roc_val}}
-        # log_model(model, c_backs, config)
         K.clear_session()
+
+    now = datetime.datetime.now()
+    logs.to_csv(os.path.join('models', 'logs', now.strftime("log_{}_%Y_%m_%d_%H_%M.csv".format(arc.name))))
 
 
 def search():
-
     tf_config = tf.ConfigProto()
     tf_config.gpu_options.allow_growth = True
     sess = tf.Session(config = tf_config)
@@ -142,12 +155,15 @@ def search():
 
                 train_model()
                 rename_file('config.yml.default', 'config.yml')
-                # try:
-                #     train_model(current = i)
-                #     rename_file('config.yml.default', 'config.yml')
-                # except:
-                #     print("Error occured")
-
 if __name__ == "__main__":
     search()
 
+
+    # def set_f_path(aa):
+    #     return "data/processed/{}.npy".format(aa)
+    # np.save(set_f_path("X_train"), X_train)
+    # np.save(set_f_path("X_test"), X_test)
+    # np.save(set_f_path("X_val"), X_val)
+    # np.save(set_f_path("y_train"), y_train)
+    # np.save(set_f_path("y_test"), y_test)
+    # np.save(set_f_path("y_val"), y_val)

@@ -1,8 +1,10 @@
 from src.helper import get_config
-from imgaug import augmenters as iaa
 import numpy as np
 from src.features.transformations import normalize_01, normalize_meanstd, create_augmenter
 
+config = get_config()
+if config["preprocessing"]["use_augmentation"]:
+    from imgaug import augmenters as iaa
 
 def apply_rescale(X):
     """Normalizes a given dataset.

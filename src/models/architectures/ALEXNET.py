@@ -36,7 +36,7 @@ class AlexNet(BaseArchitecture):
 
         # Layer 4
         alexnet.add(ZeroPadding2D((1, 1)))
-        alexnet.add(Conv2D(1024, (3, 3), padding='same'))
+        alexnet.add(Conv2D(512, (3, 3), padding='same'))
         alexnet.add(BatchNormalization())
         alexnet.add(Activation('relu'))
 
@@ -49,13 +49,13 @@ class AlexNet(BaseArchitecture):
 
         # Layer 6
         alexnet.add(Flatten())
-        alexnet.add(Dense(1024))
+        alexnet.add(Dense(512))
         alexnet.add(BatchNormalization())
         alexnet.add(Activation('relu'))
         alexnet.add(Dropout(0.5))
 
         # Layer 7
-        alexnet.add(Dense(2048))
+        alexnet.add(Dense(512))
         alexnet.add(BatchNormalization())
         alexnet.add(Activation('relu'))
         alexnet.add(Dropout(0.5))

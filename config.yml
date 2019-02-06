@@ -17,14 +17,16 @@ preprocessing:
   interpolation: cubic
   rescale: true
   rescale_method: normalize
+  use_augmentation: false
+
 train:
-  batch_size: 16
+  batch_size: 2
   callbacks:
     early_stopping:
       apply: true
       min_delta: 0.001
       mode: auto
-      monitor: loss
+      monitor: val_loss
       patience: 5
       use_default_params: false
       verbose: 1
@@ -38,18 +40,19 @@ train:
       patience: 5
       use_default_params: false
       verbose: 2
-  epochs: 10
-  gridsearch_number_tries: 40
-  n_runs: 5
+  epochs: 350
+  gridsearch_number_tries: 20
+  n_runs: 30
   optimizers:
     amsgrad: false
     architecture: xmasnet
     decay: 0.999
-    lr: 1.0e-05
-    momentum: 0.99
+    lr: 0.00001
+    momentum: 0.00
     nesterov: false
-    use: sgd
+    use: rmsprop
     use_default_params: false
   train_val_split: 0.7
-  use_augmentation: false
-  use_gridsearch: true
+  use_gridsearch: false
+  save_intermediate_outputs : false
+  fit_model : false
