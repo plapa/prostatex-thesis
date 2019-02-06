@@ -82,10 +82,7 @@ def train_model():
         end = datetime.datetime.now()
         dif = end - start
 
-        print("EXPERIMENT: {}".format(experiment_run))
-        print("TRAIN LOSS {}".format(b_train_loss))
-        print("VAL LOSS {}".format(b_val_loss))
-        print("TEST LOSS {}".format(b_test_loss))
+
 
         best_model = arc.architecture()
         best_model.load_weights(arc.weights_path)
@@ -118,6 +115,11 @@ def train_model():
             log_row[key] = value
         logs = logs.append(log_row, ignore_index=True)
 
+        print("EXPERIMENT: {}".format(experiment_run))
+        print("TRAIN LOSS {}".format(b_train_loss))
+        print("VAL LOSS {}".format(b_val_loss))
+        print("TEST LOSS {}".format(b_test_loss))
+        
         K.clear_session()
 
     now = datetime.datetime.now()
