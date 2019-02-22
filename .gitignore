@@ -88,6 +88,12 @@ config.yml
 config.yml.default
 search_params.yml
 
-models/
+
+crfasrnn_keras
+
+crfasrnn_keras/
+
+crfasrnn_keras-master.zip
+outputs/
 # Mac OS-specific storage files
 .DS_Store

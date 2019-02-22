@@ -65,10 +65,10 @@ def train_model():
         model = arc.architecture()
         c_backs = load_callbacks(arc.weights_path)
         opt = load_optimizer()
-
         
         model.compile( optimizer=opt, loss='binary_crossentropy')
         start = datetime.datetime.now()
+
 
         if config["train"]["fit_model"]:
             model.fit(X_train, y_train,
@@ -77,7 +77,7 @@ def train_model():
                     validation_data=(X_val, y_val),
                     shuffle=True,
                     callbacks=c_backs,
-                    verbose = 0)
+                    verbose = 1)
 
         end = datetime.datetime.now()
         dif = end - start
@@ -107,7 +107,7 @@ def train_model():
 
         if config["train"]["save_intermediate_outputs"]:
             label = "best_{}_{}".format(arc.name, experiment_run)
-            save_results_wrapper(best_model, best_config, 'flatten_1', label, X_train, y_train, X_test, y_test, X_val, y_val)
+            save_results_wrapper(best_model,  'flatten_1', label, X_train, y_train, X_test, y_test, X_val, y_val)
 
         log_row = {"id" : experiment_run, "metrics.time" : dif.total_seconds(), "metrics.loss.train":  b_train_loss, "metrics.loss.test": b_test_loss, "metrics.loss.val": b_val_loss, "metrics.roc.train" : b_train_roc, "metrics.roc.test" : b_test_roc, "metrics.roc.val" : b_val_roc}
 
@@ -123,7 +123,7 @@ def train_model():
         K.clear_session()
 
     now = datetime.datetime.now()
-    logs.to_csv(os.path.join('models', 'logs', now.strftime("log_{}_%Y_%m_%d_%H_%M.csv".format(arc.name))))
+    logs.to_csv(os.path.join('outputs', 'logs', now.strftime("log_{}_%Y_%m_%d_%H_%M.csv".format(arc.name))))
 
 
 def search():

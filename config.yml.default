@@ -17,8 +17,9 @@ preprocessing:
   interpolation: cubic
   rescale: true
   rescale_method: normalize
+  use_augmentation: false
 train:
-  batch_size: 16
+  batch_size: 1
   callbacks:
     early_stopping:
       apply: true
@@ -39,17 +40,18 @@ train:
       use_default_params: false
       verbose: 2
   epochs: 350
+  fit_model: true
   gridsearch_number_tries: 20
-  n_runs: 30
+  n_runs: 1
   optimizers:
     amsgrad: false
-    architecture: resnet
-    decay: 0.999
-    lr: 0.001
-    momentum: 0.99
-    nesterov: true
+    architecture: crfxmasnet
+    decay: 0
+    lr: 1.0e-07
+    momentum: 0.999
+    nesterov: false
     use: sgd
     use_default_params: false
+  save_intermediate_outputs: false
   train_val_split: 0.7
-  use_augmentation: false
   use_gridsearch: true

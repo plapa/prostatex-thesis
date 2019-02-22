@@ -18,9 +18,8 @@ preprocessing:
   rescale: true
   rescale_method: normalize
   use_augmentation: false
-
 train:
-  batch_size: 2
+  batch_size: 1
   callbacks:
     early_stopping:
       apply: true
@@ -41,18 +40,18 @@ train:
       use_default_params: false
       verbose: 2
   epochs: 350
+  fit_model: true
   gridsearch_number_tries: 20
-  n_runs: 30
+  n_runs: 1
   optimizers:
     amsgrad: false
-    architecture: xmasnet
-    decay: 0.999
-    lr: 0.00001
-    momentum: 0.00
-    nesterov: false
+    architecture: crfxmasnet
+    decay: 0.99
+    lr: 0.001
+    momentum: 0.99
+    nesterov: true
     use: rmsprop
     use_default_params: false
+  save_intermediate_outputs: false
   train_val_split: 0.7
-  use_gridsearch: false
-  save_intermediate_outputs : false
-  fit_model : false
+  use_gridsearch: true

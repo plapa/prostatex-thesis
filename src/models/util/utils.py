@@ -114,6 +114,8 @@ def load_architecture(arch):
     from src.models.architectures.ALEXNET import AlexNet
     from src.models.architectures.ResNet import ResNet
     from src.models.architectures.DenseNet import DenseNet
+    from src.models.architectures.CRFNNVGG import CRFNNVGG
+    from src.models.architectures.CRFXmasNet import CRFXmasNet
 
     arch = arch.lower()
     if arch == "fccn":
@@ -128,6 +130,10 @@ def load_architecture(arch):
         return ResNet()
     elif arch == "densenet":
         return DenseNet()
+    elif arch == "crfvgg":
+        return CRFNNVGG()
+    elif arch == "crfxmasnet":
+        return CRFXmasNet()
     else:
         print("Arch: {} is not valid. Returning fccn.".format(arch))
         return FCCN()
