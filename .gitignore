@@ -89,9 +89,7 @@ config.yml.default
 search_params.yml
 
 
-crfasrnn_keras
-
-crfasrnn_keras/
+crf_rnn_bck/
 
 crfasrnn_keras-master.zip
 outputs/
