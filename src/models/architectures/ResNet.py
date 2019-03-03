@@ -5,7 +5,7 @@ from src.models.architectures.base_architecture import BaseArchitecture
 from keras.models import Sequential, Model
 from keras.layers import Dense, Flatten, Dropout
 
-from keras.layers import Dense, GlobalAveragePooling2D
+
 from keras import backend as K
 
 class ResNet(BaseArchitecture):

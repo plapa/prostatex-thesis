@@ -46,11 +46,15 @@ train:
   optimizers:
     amsgrad: false
     architecture: crfxmasnet
-    decay: 0.99
-    lr: 0.001
-    momentum: 0.99
-    nesterov: true
-    use: rmsprop
+    crf_num_iterations: 10
+    crf_theta_alpha: 0.5
+    crf_theta_beta: 3.0
+    crf_theta_gamma: 2.0
+    decay: 0.999
+    lr: 1.0e-05
+    momentum: 0.0
+    nesterov: false
+    use: sgd
     use_default_params: false
   save_intermediate_outputs: false
   train_val_split: 0.7
