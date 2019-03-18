@@ -6,6 +6,7 @@ from keras.layers import Conv2D, MaxPooling2D, Input, ZeroPadding2D, \
     Dropout, Conv2DTranspose, Cropping2D, Add, Flatten, Dense
 from src.models.architectures.layers import CrfRnnLayer
 
+from src.helper import get_config
 
 
 class CRFNNVGG(BaseArchitecture):
@@ -13,6 +14,8 @@ class CRFNNVGG(BaseArchitecture):
     name = "CRFNN"
     flaten_layer = "flatten_1"
     def architecture(self):
+        config = get_config()
+        config = config["train"]["optimizers"]
 
         channels, height, weight = 3, 500, 500
 
@@ -80,17 +83,18 @@ class CRFNNVGG(BaseArchitecture):
         score_final = Add()([score4, score_pool3c])
 
         # Final up-sampling and cropping
-        upsample = Conv2DTranspose(1, (230, 230), strides=6, name='upsample', use_bias=False)(score_final)
-        #upscore = Cropping2D(((31, 37), (31, 37)))(upsample)
-        #upscore = Cropping2D(((1, 1), (1, 1)))(upsample)
+        upsample = Conv2DTranspose(1, (4, 4), strides=4, name='upsample', use_bias=False)(score_final)
+        upscore = Cropping2D(((56, 56), (56, 56)))(upsample)
+        upscore = Cropping2D(((4, 4), (4, 4)))(upscore)
 
-        output = CrfRnnLayer(image_dims=(height, weight),
+        output = CrfRnnLayer(image_dims=(64, 64),
                             num_classes=1,
-                            theta_alpha=3.,
-                            theta_beta=3.,
-                            theta_gamma=3.,
-                            num_iterations=10,
-                            name='crfrnn')([upsample, img_input])
+                            theta_alpha= config["crf_theta_alpha"], #3
+                            theta_beta= config["crf_theta_beta"], #3
+                            theta_gamma= config["crf_theta_gamma"], #3
+                            num_iterations= config["crf_num_iterations"],
+                            name='crfrnn')([upscore, img_input])
+
 
         k = MaxPooling2D((2,2), 2)(output)
         k = Flatten()(k)

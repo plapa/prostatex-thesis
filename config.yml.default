@@ -42,20 +42,20 @@ train:
   epochs: 350
   fit_model: true
   gridsearch_number_tries: 20
-  n_runs: 1
+  n_runs: 30
   optimizers:
     amsgrad: false
-    architecture: crfresnet
-    crf_num_iterations: 10
-    crf_theta_alpha: 3.
-    crf_theta_beta: 3.0
-    crf_theta_gamma: 3.
-    decay: 0.99
-    lr: 0.0001
-    momentum: 0.999
-    nesterov: false
-    use: adam
+    architecture: crfvgg
+    crf_num_iterations: 5
+    crf_theta_alpha: 3.0
+    crf_theta_beta: 2.0
+    crf_theta_gamma: 1.0
+    decay: 0.999
+    lr: 0.01
+    momentum: 0.0
+    nesterov: true
+    use: rmsprop
     use_default_params: false
-  save_intermediate_outputs: false
+  save_intermediate_outputs: true
   train_val_split: 0.7
   use_gridsearch: true

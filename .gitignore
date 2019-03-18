@@ -93,5 +93,6 @@ crf_rnn_bck/
 
 crfasrnn_keras-master.zip
 outputs/
+models/
 # Mac OS-specific storage files
 .DS_Store

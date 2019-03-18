@@ -84,11 +84,13 @@ def train_model():
 
 
 
-        best_model = arc.architecture()
-        best_model.load_weights(arc.weights_path)
 
 
-        best_model = model
+        if config["train"]["fit_model"]:
+            best_model = arc.architecture()
+            best_model.load_weights(arc.weights_path)
+        else:
+            best_model = model
 
 
         roc_train = calculate_roc(best_model, X_train, y_train)
