@@ -117,11 +117,14 @@ def train_model():
             log_row[key] = value
         logs = logs.append(log_row, ignore_index=True)
 
+
         print("EXPERIMENT: {}".format(experiment_run))
         print("TRAIN LOSS {}".format(b_train_loss))
         print("VAL LOSS {}".format(b_val_loss))
         print("TEST LOSS {}".format(b_test_loss))
         
+
+        log_model(model, c_backs, log_row)
         K.clear_session()
 
     now = datetime.datetime.now()

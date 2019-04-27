@@ -22,7 +22,7 @@ class CRFXmasNet(BaseArchitecture):
         channels, height, weight = 3, 500, 500
 
         # Input
-        input_shape = (height, weight, 3)
+        #input_shape = (height, weight, 3)
         img_input = Input(shape=self.input_shape)
         #img_input = Cropping2D((3,3))(img_input)
 

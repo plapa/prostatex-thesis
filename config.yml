@@ -26,7 +26,7 @@ train:
       min_delta: 0.001
       mode: auto
       monitor: val_loss
-      patience: 5
+      patience: 10
       use_default_params: false
       verbose: 1
     lr_reduce:
@@ -39,23 +39,23 @@ train:
       patience: 5
       use_default_params: false
       verbose: 2
-  epochs: 350
+  epochs: 10
   fit_model: true
   gridsearch_number_tries: 20
   n_runs: 30
   optimizers:
     amsgrad: false
-    architecture: crfvgg
+    architecture: crfxmasnet
     crf_num_iterations: 5
     crf_theta_alpha: 3.0
-    crf_theta_beta: 1.0
-    crf_theta_gamma: 3.0
+    crf_theta_beta: 0.5
+    crf_theta_gamma: 2.0
     decay: 0
-    lr: 0.001
-    momentum: 0.999
+    lr: 0.0001
+    momentum: 0.0
     nesterov: true
     use: adam
     use_default_params: false
-  save_intermediate_outputs: true
+  save_intermediate_outputs: false
   train_val_split: 0.7
-  use_gridsearch: true
+  use_gridsearch: false
