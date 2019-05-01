@@ -27,67 +27,77 @@ class CRFXmasNet(BaseArchitecture):
         #img_input = Cropping2D((3,3))(img_input)
 
         # Add plenty of zero padding
-        x = ZeroPadding2D(padding=(218, 218))(img_input)
+        #x = ZeroPadding2D(padding=(218, 218))(img_input)
 
         # block 1
-        x = MaxPooling2D(2)(img_input)
+
+        x = Conv2D(strides=1, filters= 32, kernel_size=3, padding="same")(img_input)
+        x = BatchNormalization()(x)
+        x = Activation(activation="relu")(x)
         x = Conv2D(strides=1, filters= 32, kernel_size=3, padding="same")(x)
         x = BatchNormalization()(x)
         x = Activation(activation="relu")(x)
 
+        block1 = x
+
+
+
+
+        x = MaxPooling2D((2,2), 2, padding="same")(x)
 
 
         # block 2
-        x = MaxPooling2D(2)(img_input)
+
         x = Conv2D(strides=1, filters= 32, kernel_size=3, padding="same")(x)
         x = BatchNormalization()(x)
         x = Activation(activation="relu")(x)
+
+        x = Conv2D(strides=1, filters= 32, kernel_size=3, padding="same")(x)
+        x = BatchNormalization()(x)
+        x = Activation(activation="relu")(x)
+
+        block2 = x
+
 
         x = MaxPooling2D((2,2), 2, padding="same")(x)
+        
 
-
-        # block 3
-        x = MaxPooling2D(2)(img_input)
-        x = Conv2D(strides=1, filters= 32, kernel_size=3, padding="same")(x)
-        x = BatchNormalization()(x)
-        x = Activation(activation="relu")(x)
-
-        # block 4
-        x = MaxPooling2D(2)(img_input)
-        x = Conv2D(strides=1, filters= 32, kernel_size=3, padding="same")(x)
-        x = BatchNormalization()(x)
-        x = Activation(activation="relu")(x)
-
-        x = MaxPooling2D((2,2), 2, padding="same")(x)
-
-        # Fully-connected layers converted to convolution layers
         x = Conv2D(512, (7, 7), activation='relu', padding='valid', name='fc6')(x)
-        x = Dropout(0.5)(x)
         x = Conv2D(512, (1, 1), activation='relu', padding='valid', name='fc7')(x)
-        x = Dropout(0.5)(x)
         x = Conv2D(21, (1, 1), padding='valid', name='score-fr')(x)
 
+        block3 = x
+
         # Deconvolution
-        score2 = Conv2DTranspose(1, (4, 4), strides=2, name='score2')(x)
+
+        score1 = Conv2D(1, (1, 1))(block1)
+
+        score2 = Conv2D(1, (1, 1))(block2)
+        score2 = Conv2DTranspose(1, (2, 2), strides=2, name='score2', use_bias=False)(score2)
+
+        score3 = Conv2D(1, (1, 1))(block3)
+        score3 = Conv2DTranspose(1, (2, 2), strides=6)(score3)
+        score3 = ZeroPadding2D(2)(score3)
+
 
         # Fuse things together
         #score_final = Add()([score4, score_pool3c])
 
         # Final up-sampling and cropping
-        upsample = Conv2DTranspose(1, (4, 4), strides=4, name='upsample', use_bias=False)(score2)
-        upscore = Cropping2D((12, 12))(upsample)
-        #upscore = Cropping2D(((1, 1), (1, 1)))(upsample)
 
-        #img_input = ZeroPadding2D(padding=(218, 218))(img_input)
+        score = Add()([score1, score2])
+        score_pool = Add()([score, score3])
+
         output = CrfRnnLayer(image_dims=(64, 64),
                             num_classes=1,
                             theta_alpha= config["crf_theta_alpha"], #3
                             theta_beta= config["crf_theta_beta"], #3
                             theta_gamma= config["crf_theta_gamma"], #3
                             num_iterations= config["crf_num_iterations"],
-                            name='crfrnn')([upscore, img_input])
+                            name='crfrnn')([score_pool, img_input])
 
-        k = Flatten()(output)
+        classi = Add()([score_pool, output])
+        k = Flatten()(classi)
 
         k = Dense(128, activation='relu')(k)
         k = Dropout(.5)(k)

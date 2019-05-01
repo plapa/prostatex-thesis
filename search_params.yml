@@ -1,8 +1,8 @@
 train:
     optimizers:
-        architecture : [crfvgg]
-        use : [sgd, adam, rmsprop]
-        lr : [0.01, 0.001, 0.0001, 0.00001, 0.0000001]
+        architecture : [crfxmasnet]
+        use : [adam, rmsprop]
+        lr : [0.01, 0.001, 0.0001]
         momentum : [0.0, 0.99, 0.999]
         decay : [0, 0.99, 0.999]
         nesterov : [True, False]

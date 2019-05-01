@@ -65,8 +65,17 @@ def train_model():
         model = arc.architecture()
         c_backs = load_callbacks(arc.weights_path)
         opt = load_optimizer()
-        
-        model.compile( optimizer=opt, loss='binary_crossentropy')
+
+        is_crf = True if "CRF" in config["train"]["optimizers"]["architecture"].upper() else False
+
+        print("CRF : {}".format(is_crf))
+
+        _loss = 'binary_crossentropy'
+
+        if is_crf:
+            #_loss = 'mean_squared_error'
+            pass
+        model.compile( optimizer=opt, loss=_loss)
         start = datetime.datetime.now()
 
 
@@ -122,7 +131,8 @@ def train_model():
         print("TRAIN LOSS {}".format(b_train_loss))
         print("VAL LOSS {}".format(b_val_loss))
         print("TEST LOSS {}".format(b_test_loss))
-        
+        print("TEST AUROC {}".format(b_test_roc))
+
 
         log_model(model, c_backs, log_row)
         K.clear_session()
