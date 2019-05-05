@@ -61,20 +61,22 @@ def train_model():
     print(" ################################## ")
 
     for experiment_run in range(config["train"]["n_runs"]):
+
+        start = datetime.datetime.now()
+
+        print("CURRENT MODEL: " + str(current))
+        print("EXPERIMENT: {}".format(experiment_run))
+        print("TIME: {}".format(start))
+
         arc = load_architecture(config["train"]["optimizers"]["architecture"])
         model = arc.architecture()
         c_backs = load_callbacks(arc.weights_path)
         opt = load_optimizer()
 
-        is_crf = True if "CRF" in config["train"]["optimizers"]["architecture"].upper() else False
-
-        print("CRF : {}".format(is_crf))
+        is_crf = True if "CRF" in config["train"]["optimizers"]["architecture"].upper() else False)
 
         _loss = 'binary_crossentropy'
 
-        if is_crf:
-            #_loss = 'mean_squared_error'
-            pass
         model.compile( optimizer=opt, loss=_loss)
         start = datetime.datetime.now()
 
@@ -86,7 +88,7 @@ def train_model():
                     validation_data=(X_val, y_val),
                     shuffle=True,
                     callbacks=c_backs,
-                    verbose = 1)
+                    verbose = 0)
 
         end = datetime.datetime.now()
         dif = end - start
