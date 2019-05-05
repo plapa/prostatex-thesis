@@ -59,3 +59,4 @@ train:
   save_intermediate_outputs: false
   train_val_split: 0.7
   use_gridsearch: false
+  verbose : 0

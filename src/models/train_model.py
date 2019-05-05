@@ -73,7 +73,7 @@ def train_model():
         c_backs = load_callbacks(arc.weights_path)
         opt = load_optimizer()
 
-        is_crf = True if "CRF" in config["train"]["optimizers"]["architecture"].upper() else False)
+
 
         _loss = 'binary_crossentropy'
 
@@ -88,12 +88,10 @@ def train_model():
                     validation_data=(X_val, y_val),
                     shuffle=True,
                     callbacks=c_backs,
-                    verbose = 0)
+                    verbose = config["train"]["verbose"])
 
         end = datetime.datetime.now()
         dif = end - start
-
-
 
 
 
@@ -140,8 +138,16 @@ def train_model():
         K.clear_session()
 
     now = datetime.datetime.now()
-    logs.to_csv(os.path.join('outputs', 'logs', now.strftime("log_{}_%Y_%m_%d_%H_%M.csv".format(arc.name))))
 
+    log_path = os.path.join('outputs', 'logs', now.strftime("log_{}_%Y_%m_%d_%H_%M.csv".format(arc.name)))
+    logs.to_csv(log_path)
+
+    print( "LOGS SAVED AS: {}: ".format(log_path))
+
+    print(" ")
+    print(" ")
+    print(" ")
+    print(" ")
 
 def search():
     tf_config = tf.ConfigProto()
