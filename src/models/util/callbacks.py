@@ -41,8 +41,8 @@ def load_callbacks(weights_path):
     metrics = Metrics()
     model_checkpoint = ModelCheckpoint(weights_path, monitor='val_loss', save_best_only=True)
 
-    cbacks = [metrics, model_checkpoint]    
-    #cbacks = [ model_checkpoint]
+    #cbacks = [metrics, model_checkpoint]    
+    cbacks = [ model_checkpoint]
 
     lr_reduce = cbacks_config["lr_reduce"]
     if lr_reduce['apply']:

@@ -88,7 +88,7 @@ def train_model():
                     validation_data=(X_val, y_val),
                     shuffle=True,
                     callbacks=c_backs,
-                    verbose = 0)
+                    verbose = config["train"]["verbose"])
 
         end = datetime.datetime.now()
         dif = end - start
