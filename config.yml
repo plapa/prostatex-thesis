@@ -45,7 +45,7 @@ train:
   n_runs: 1
   optimizers:
     amsgrad: false
-    architecture: crfxmasnet
+    architecture: crfvgg
     crf_num_iterations: 5
     crf_theta_alpha: 0.5
     crf_theta_beta: 2.0

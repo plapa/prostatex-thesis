@@ -11,7 +11,7 @@ from src.helper import get_config
 
 class CRFNNVGG(BaseArchitecture):
 
-    name = "CRFNN"
+    name = "CRFVGG"
     flaten_layer = "flatten_1"
     def architecture(self):
         config = get_config()
@@ -96,8 +96,8 @@ class CRFNNVGG(BaseArchitecture):
                             name='crfrnn')([upscore, img_input])
 
 
-        k = MaxPooling2D((2,2), 2)(output)
-        k = Flatten()(k)
+        classi = Add()([upscore, output])
+        k = Flatten()(classi)
 
         k = Dense(128, activation='relu')(k)
         k = Dropout(.5)(k)
@@ -105,7 +105,7 @@ class CRFNNVGG(BaseArchitecture):
         predictions = Dense(1, activation='sigmoid')(k)
 
         # Build the model
-        model = Model(img_input, predictions, name='crfrnn_net')
+        model = Model(img_input, predictions, name='CRFVGG')
 
         return model
 
