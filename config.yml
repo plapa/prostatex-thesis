@@ -39,24 +39,25 @@ train:
       patience: 5
       use_default_params: false
       verbose: 2
-  epochs: 100
+  epochs: 350
   fit_model: true
-  gridsearch_number_tries: 20
-  n_runs: 1
+  gridsearch_number_tries: 10
+  n_runs: 10
   optimizers:
     amsgrad: false
-    architecture: crfvgg
+    architecture: crfxmasnet
     crf_num_iterations: 5
     crf_theta_alpha: 0.5
     crf_theta_beta: 2.0
     crf_theta_gamma: 2.0
-    decay: 0
+    crf_initializer: default
+    decay: 0.001
     lr: 0.0001
-    momentum: 0.999
+    momentum: 0.0
     nesterov: false
     use: adam
     use_default_params: false
   save_intermediate_outputs: false
   train_val_split: 0.7
-  use_gridsearch: false
-  verbose : 0
+  use_gridsearch: true
+  verbose : 1

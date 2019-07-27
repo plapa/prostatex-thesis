@@ -30,6 +30,25 @@ from keras.engine.topology import Layer
 import crfasrnn_keras.src.high_dim_filter_loader as high_dim_filter_loader
 custom_module = high_dim_filter_loader.custom_module
 
+from src.helper import get_config
+
+
+config = get_config()
+
+
+def _random_diagonal_initializer(shape):
+    a = np.eye(shape[0], shape[1], dtype=np.float32)
+    n = len(a.diagonal)
+
+    dig = np.random.rand(n)
+    indices = np.diag_indices_from(a)
+
+    a[indices] = dig
+
+    return a
+
+def _random_initializer(shape):     
+    return np.random.rand(shape[0],shape[1]).astype(np.float32)
 
 
 def _diagonal_initializer(shape):
@@ -63,16 +82,29 @@ class CrfRnnLayer(Layer):
         super(CrfRnnLayer, self).__init__(**kwargs)
 
     def build(self, input_shape):
+
+
+        init = config["train"]["optimizers"]["crf_initializer"]
+
+        if init == "diagonal":
+            initializer = _diagonal_initializer
+        elif init == "random":
+            initializer = _random_initializer
+        elif init == "random_diagonal":
+            initializer = _random_diagonal_initializer
+        else:
+            initializer = _diagonal_initializer
+
         # Weights of the spatial kernel
         self.spatial_ker_weights = self.add_weight(name='spatial_ker_weights',
                                                    shape=(self.num_classes, self.num_classes),
-                                                   initializer=_diagonal_initializer,
+                                                   initializer=initializer,
                                                    trainable=True)
 
         # Weights of the bilateral kernel
         self.bilateral_ker_weights = self.add_weight(name='bilateral_ker_weights',
                                                      shape=(self.num_classes, self.num_classes),
-                                                     initializer=_diagonal_initializer,
+                                                     initializer=initializer,
                                                      trainable=True)
 
         # Compatibility matrix
