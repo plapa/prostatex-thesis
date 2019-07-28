@@ -62,24 +62,19 @@ class CRFXmasNet(BaseArchitecture):
         x = MaxPooling2D((2,2), 2, padding="same")(x)
         
 
-        x = Conv2D(512, (7, 7), activation='relu', padding='valid', name='fc6')(x)
-        x = Conv2D(512, (1, 1), activation='relu', padding='valid', name='fc7')(x)
-        x = Conv2D(21, (1, 1), padding='valid', name='score-fr')(x)
-
         block3 = x
 
         # Deconvolution
 
         score1 = Conv2D(1, (1, 1))(block1)
-
         score2 = Conv2D(1, (1, 1))(block2)
         score2 = Conv2DTranspose(1, (2, 2), strides=2, name='score2', use_bias=False)(score2)
 
         score3 = Conv2D(1, (1, 1))(block3)
-        score3 = Conv2DTranspose(1, (2, 2), strides=6)(score3)
+        score3 = Conv2DTranspose(1, (2, 2), strides=4)(score3)
         #
         score3 = BatchNormalization()(score3)
-        score3 = ZeroPadding2D(2)(score3)
+        #score3 = ZeroPadding2D(2)(score3)
 
 
         # Fuse things together
@@ -102,6 +97,7 @@ class CRFXmasNet(BaseArchitecture):
                             num_iterations= config["crf_num_iterations"],
                             name='crfrnn')([score_pool, img_input])
         #
+
         output = BatchNormalization()(output)
 
         classi = Add()([score_pool, output])
