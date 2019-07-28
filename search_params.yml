@@ -9,4 +9,4 @@ train:
         crf_theta_alpha : [1., 0.5, 2., 3.]
         crf_theta_beta : [1., 0.5, 2., 3.]
         crf_theta_gamma : [1., 0.5, 2., 3.]
-        crf_initializer : [diagonal, random, random_diagonal]
+        crf_initializer : [diagonal]

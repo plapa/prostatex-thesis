@@ -77,6 +77,8 @@ class CRFXmasNet(BaseArchitecture):
 
         score3 = Conv2D(1, (1, 1))(block3)
         score3 = Conv2DTranspose(1, (2, 2), strides=6)(score3)
+        #
+        score3 = BatchNormalization()(score3)
         score3 = ZeroPadding2D(2)(score3)
 
 
@@ -86,15 +88,21 @@ class CRFXmasNet(BaseArchitecture):
         # Final up-sampling and cropping
 
         score = Add()([score1, score2])
+        #
+        score = BatchNormalization()(score)
         score_pool = Add()([score, score3])
+        #
+        score_pool = BatchNormalization()(score_pool)
 
         output = CrfRnnLayer(image_dims=(64, 64),
-                            num_classes=1,
+                            num_classes=2,
                             theta_alpha= config["crf_theta_alpha"], #3
                             theta_beta= config["crf_theta_beta"], #3
                             theta_gamma= config["crf_theta_gamma"], #3
                             num_iterations= config["crf_num_iterations"],
                             name='crfrnn')([score_pool, img_input])
+        #
+        output = BatchNormalization()(output)
 
         classi = Add()([score_pool, output])
         k = Flatten()(classi)
