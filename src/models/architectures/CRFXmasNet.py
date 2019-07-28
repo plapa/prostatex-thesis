@@ -95,7 +95,7 @@ class CRFXmasNet(BaseArchitecture):
         score_pool = BatchNormalization()(score_pool)
 
         output = CrfRnnLayer(image_dims=(64, 64),
-                            num_classes=2,
+                            num_classes=1,
                             theta_alpha= config["crf_theta_alpha"], #3
                             theta_beta= config["crf_theta_beta"], #3
                             theta_gamma= config["crf_theta_gamma"], #3
