@@ -38,7 +38,7 @@ config = get_config()
 
 def _random_diagonal_initializer(shape):
     a = np.eye(shape[0], shape[1], dtype=np.float32)
-    n = len(a.diagonal)
+    n = len(a.diagonal())
 
     dig = np.random.rand(n)
     indices = np.diag_indices_from(a)
