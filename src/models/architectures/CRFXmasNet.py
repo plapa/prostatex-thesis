@@ -40,19 +40,16 @@ class CRFXmasNet(BaseArchitecture):
 
         block1 = x
 
-
-
-
         x = MaxPooling2D((2,2), 2, padding="same")(x)
 
 
         # block 2
 
-        x = Conv2D(strides=1, filters= 32, kernel_size=3, padding="same")(x)
+        x = Conv2D(strides=1, filters= 16, kernel_size=3, padding="same")(x)
         x = BatchNormalization()(x)
         x = Activation(activation="relu")(x)
 
-        x = Conv2D(strides=1, filters= 32, kernel_size=3, padding="same")(x)
+        x = Conv2D(strides=1, filters= 16, kernel_size=3, padding="same")(x)
         x = BatchNormalization()(x)
         x = Activation(activation="relu")(x)
 
