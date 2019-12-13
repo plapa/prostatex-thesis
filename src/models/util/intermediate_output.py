@@ -26,6 +26,7 @@ def save_results(model, X, y, label, d_set, layer_name):
 
 
 def save_results_wrapper(model, layer_name, label, X_train, y_train, X_test, y_test, X_val, y_val):
+    print(model.summary())
     save_results(model=model, X= X_train, y = y_train,layer_name = layer_name,label = label, d_set = "train")    
     save_results(model = model,X=  X_test,y= y_test, layer_name= layer_name,label = label,d_set= "test")
     save_results(model = model,X=  X_val,y= y_val, layer_name= layer_name,label = label,d_set= "val")

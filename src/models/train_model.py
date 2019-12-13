@@ -33,7 +33,8 @@ current = 0
 X = np.load("data/processed/X_t2_PD_ADC.npy")
 y = np.load("data/processed/y_t2_PD_ADC.npy")
 
-#X_train, X_test, y_train, y_test = split_train_val(X = X, y = y, seed = 42)
+
+X_train, X_test, y_train, y_test = split_train_val(X = X, y = y, seed = 42)
 
 X_train, X_test, y_train, y_test = split_train_val(X = X, y = y, prc = .8, seed = 42)
 
@@ -155,6 +156,36 @@ def search():
     sess = tf.Session(config = tf_config)
 
     tf.logging.set_verbosity(tf.logging.ERROR)
+
+    if config["train"]["crf_post_processing"]:
+
+        global X_train
+        global y_train
+        global X_test
+        global y_test
+        global X_val
+        global y_val
+
+        unique_runs = list_of_features_files()
+
+        for f in unique_runs:
+            first_path = "data/processed/intermediate/{}".format(f)
+            train_path = "{}_train.npy".format(first_path)
+            val_path = "{}_val.npy".format(first_path)
+            test_path = "{}_test.npy".format(first_path)
+
+            X_train = np.load(train_path)
+            X_test = np.load(test_path)
+            X_val = np.load(val_path)
+
+            X_train, y_train = reshape_flat_array(X_train)
+            X_test, y_test = reshape_flat_array(X_test)
+            X_val, y_val = reshape_flat_array(X_val)
+
+            X_train = apply_rescale(X_train)
+            X_test = apply_rescale(X_test)
+            X_val = apply_rescale(X_val)
+            train_model()
 
     if config["train"]["use_gridsearch"] == False:
         train_model()

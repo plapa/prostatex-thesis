@@ -19,6 +19,7 @@ preprocessing:
   rescale_method: normalize
   use_augmentation: false
 train:
+  crf_post_processing: false
   batch_size: 1
   callbacks:
     early_stopping:
@@ -42,14 +43,14 @@ train:
   epochs: 10
   fit_model: true
   gridsearch_number_tries: 10
-  n_runs: 10
+  n_runs: 1
   optimizers:
     amsgrad: false
-    architecture: crfxmasnet
+    architecture: crfalex
     crf_num_iterations: 5
-    crf_theta_alpha: 0.5
-    crf_theta_beta: 3.0
-    crf_theta_gamma: 3.0
+    crf_theta_alpha: 1.0
+    crf_theta_beta: 1.0
+    crf_theta_gamma: 0.5
     crf_initializer: default
     decay: 0.001
     lr: 0.0001

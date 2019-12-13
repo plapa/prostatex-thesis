@@ -117,6 +117,8 @@ def load_architecture(arch):
     from src.models.architectures.CRFNNVGG import CRFNNVGG
     from src.models.architectures.CRFXmasNet import CRFXmasNet
     from src.models.architectures.CRFResNet import CRFResNet
+    from src.models.architectures.VCRF import VCRF
+    from src.models.architectures.CRFAlexNet import CRFAlexNet
 
     arch = arch.lower()
     if arch == "fccn":
@@ -137,6 +139,10 @@ def load_architecture(arch):
         return CRFXmasNet()
     elif arch == "crfresnet":
         return CRFResNet()
+    elif arch == "vcrf":
+        return VCRF()
+    elif arch == "crfalex":
+        return CRFAlexNet()
     else:
         print("Arch: {} is not valid. Returning fccn.".format(arch))
         return FCCN()
@@ -190,6 +196,18 @@ def calculate_cross_entropy(model, y_true, X_pred):
 
     return mean_error
 
+def reshape_flat_array(data):
+    y = data[:, 4096]
+    X = data[:, :4096]
+    X = X.reshape((-1, 64, 64, 1))
 
+    return X, y
+
+def list_of_features_files():
+    feat_path = "data/processed/intermediate/"
+    runs_files = os.listdir(feat_path)
+    list_of_runs = list(set(["_".join(a.split("_")[:3]) for a in runs_files]))
+    list_of_runs.sort()
+    return list_of_runs
 
 
