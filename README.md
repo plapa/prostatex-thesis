@@ -1,7 +1,15 @@
 ProstateX
 ==============================
 
-Trying to create a novel way of predicting prostate cancer
+Trying to create a novel way of predicting prostate cancer for the challenge [PROSTATEx Challenge 2017](https://wiki.cancerimagingarchive.net/display/Public/PROSTATEx+Challenge+2017) using Conditional Random Fields
+
+## Accompanying papers
+
+*  [Lapa, P.; Castelli, M.; Gonçalves, I.; Sala, E.; Rundo, L. A Hybrid End-to-End Approach Integrating Conditional Random Fields into CNNs for Prostate Cancer Detection on MRI. Appl. Sci. 2020, 10, 338. https://doi.org/10.3390/app10010338](https://www.mdpi.com/2076-3417/10/1/338#)
+*   [Paulo Lapa, Ivo Gonçalves, Leonardo Rundo, and Mauro Castelli. 2019. Semantic learning machine improves the CNN-Based detection of prostate cancer in non-contrast-enhanced MRI. In Proceedings of the Genetic and Evolutionary Computation Conference Companion (GECCO '19). Association for Computing Machinery, New York, NY, USA, 1837–1845. DOI:https://doi.org/10.1145/3319619.3326864](https://dl.acm.org/doi/abs/10.1145/3319619.3326864)
+*   [Paulo Lapa, Ivo Gonçalves, Leonardo Rundo, and Mauro Castelli. 2019. Enhancing classification performance of convolutional neural networks for prostate cancer detection on magnetic resonance images: a study with the semantic learning machine. In Proceedings of the Genetic and Evolutionary Computation Conference Companion (GECCO '19). Association for Computing Machinery, New York, NY, USA, 381–382. DOI:https://doi.org/10.1145/3319619.3322035](https://dl.acm.org/doi/abs/10.1145/3319619.3322035)
+*   [Conditional random fields improve the CNN-based prostate cancer classification performance, Master Thesis, 2019](https://run.unl.pt/handle/10362/89470)
+
 
 Project Organization
 ------------
