@@ -3,7 +3,7 @@ albumentations==0.1.2
 astor==0.7.1
 backcall==0.1.0
 bleach==2.1.4
-certifi==2018.8.24
+certifi==2022.12.7
 cloudpickle==0.6.1
 cycler==0.10.0
 dask==0.20.0
